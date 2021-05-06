@@ -17,7 +17,7 @@ Revoke a DSC certificate of a country
 * check that DSC is in trustlist
 * delete DSC created
 * check that the response had no error
-* check that DSC is not in keylist
+* check that DSC is not in trustlist
 
 ## delete a DSC with unauthorized authentication
 

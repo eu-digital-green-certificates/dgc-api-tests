@@ -16,7 +16,7 @@ from random import choice
 def check_dsc_is_in_trustlist():
     get_complete_trustlist();
     response = data_store.scenario["response"]
-    assert response.status_code == 200, "Coudn't get trustlist"
+    assert response.ok, "Coudn't get trustlist"
     data = response.json()
     certs_in_trustlist = [x["rawData"] for x in data]
     dscRaw = b64encode(data_store.scenario["dsc"].public_bytes(
@@ -25,11 +25,11 @@ def check_dsc_is_in_trustlist():
     assert dscRaw in certs_in_trustlist, "DSC not in trustlist"
 
 
-@step("check that DSC is not in keylist")
-def check_that_dsc_is_not_in_keylist():
+@step("check that DSC is not in trustlist")
+def check_that_dsc_is_not_in_trustlist():
     get_complete_trustlist()
     response = data_store.scenario["response"]
-    assert response.status_code == 200, "Coudn't get trustlist"
+    assert response.ok, "Coudn't get trustlist"
     data = response.json()
     certs_in_trustlist = [x["rawData"] for x in data]
     dscRaw = b64encode(data_store.scenario["dsc"].public_bytes(

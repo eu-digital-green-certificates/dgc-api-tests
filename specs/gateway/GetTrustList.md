@@ -14,9 +14,13 @@ all test cases for getting the DSC (Signing Certificates)
 
 Get all trusted public keys
 
-* get complete trustlist
-* check that the response had no error
-* check that created keys are in trustlist
+* create a valid DSC
+* sign DSC with UPLOAD certificate
+* check that DSC is not in trustlist
+* upload DSC
+* check that DSC is in trustlist
+* delete DSC created
+* check that DSC is not in trustlist
 
 ## get trustlist with specific type
 
