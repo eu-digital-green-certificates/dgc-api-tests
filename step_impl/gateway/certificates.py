@@ -10,10 +10,8 @@ from cryptography.x509 import Certificate
 from cryptography.x509.oid import NameOID
 
 
-def create_dsc(csca_cert: Certificate, csca_key: RSAPrivateKey):
+def create_certificate(signing_cert: Certificate = None, signing_key: Certificate = None):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-
-    issuer = csca_cert.issuer
 
     subject = x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, u"DE"),
@@ -24,8 +22,16 @@ def create_dsc(csca_cert: Certificate, csca_key: RSAPrivateKey):
                            u"T-Systems International"),
         x509.NameAttribute(NameOID.COMMON_NAME, u"api-test"),
     ])
+
+    issuer = signing_cert.issuer if signing_cert != None else subject
+    keyUsedToSign = signing_key if signing_key != None else key
     cert = x509.CertificateBuilder().subject_name(subject).issuer_name(issuer).public_key(key.public_key()).serial_number(
-        x509.random_serial_number()).not_valid_before(datetime.utcnow()).not_valid_after(datetime.utcnow() + timedelta(seconds=10)).sign(csca_key, hashes.SHA256())
+        x509.random_serial_number()).not_valid_before(datetime.utcnow()).not_valid_after(datetime.utcnow() + timedelta(seconds=10)).sign(keyUsedToSign, hashes.SHA256())
+    return (cert, key)
+
+
+def create_dsc(csca_cert: Certificate, csca_key: RSAPrivateKey):
+    (cert, key) = create_certificate(csca_cert, csca_key)
     return cert
 
 

@@ -1,11 +1,41 @@
+from base64 import b64encode
 from os import path
 
 import requests
+from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
 
 from . import baseurl, certificateFolder
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from random import choice
 
+
+@step("check that DSC is in trustlist")
+def check_dsc_is_in_trustlist():
+    get_complete_trustlist();
+    response = data_store.scenario["response"]
+    assert response.status_code == 200, "Coudn't get trustlist"
+    data = response.json()
+    certs_in_trustlist = [x["rawData"] for x in data]
+    dscRaw = b64encode(data_store.scenario["dsc"].public_bytes(
+        serialization.Encoding.DER)).decode('UTF-8')
+
+    assert dscRaw in certs_in_trustlist, "DSC not in trustlist"
+
+
+@step("check that DSC is not in keylist")
+def check_that_dsc_is_not_in_keylist():
+    get_complete_trustlist()
+    response = data_store.scenario["response"]
+    assert response.status_code == 200, "Coudn't get trustlist"
+    data = response.json()
+    certs_in_trustlist = [x["rawData"] for x in data]
+    dscRaw = b64encode(data_store.scenario["dsc"].public_bytes(
+        serialization.Encoding.DER)).decode('UTF-8')
+
+    assert dscRaw not in certs_in_trustlist, "DSC not in trustlist"
 
 @step("get complete trustlist")
 def get_complete_trustlist():
@@ -50,3 +80,14 @@ def check_that_only_entries_of_the_type_and_county_are_present(type, country):
     data = response.json()
     assert all(x == country for x in [y["country"]
                for y in data]), f"found not only country {country}"
+
+@step("get random DSC from trustlist from another country")
+def get_random_dsc_from_trustlist_from_another_country():
+    trustListResponse: Response = data_store.scenario["response"]
+    assert trustListResponse.ok, "Couldn't get trustlist"
+    trustList = trustListResponse.json()
+    csca_cert = x509.load_pem_x509_certificate(
+        open(path.join(certificateFolder, "csca.pem"), "rb").read())
+    country = csca_cert.subject.get_attributes_for_oid(NameOID.COUNTRY_NAME)[0].value
+    randomDsc = choice([x["rawData"] for x in trustList if x["country"] != country])
+    data_store.scenario["signed_dsc"] = randomDsc

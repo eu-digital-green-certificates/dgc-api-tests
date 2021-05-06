@@ -15,14 +15,9 @@ def check_that_the_response_had_an_error():
     assert status_code <= 200 or 299 <= status_code, "Response Code had no error but it should"
 
 
-@step("check that the response had the error <error>")
-def check_that_the_response_had_the_error(error):
-    response = data_store.scenario["response"]
-    print(response.status_code)
-
-
 @step("check that the response had the status code <int>")
 def check_that_the_response_had_the_status_code(expected):
     response = data_store.scenario["response"]
     status_code = response.status_code
-    assert status_code == int(expected), f"response status code was {status_code} but expected {expected}"
+    assert status_code == int(
+        expected), f"response status code was {status_code} but expected {expected}"

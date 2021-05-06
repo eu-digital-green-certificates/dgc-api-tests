@@ -8,9 +8,18 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
 
-from . import baseurl, certificateFolder
-from .certificates import create_cms, create_dsc
+from . import baseurl, certificateFolder, authCerts
+from .certificates import create_cms, create_dsc, create_certificate
+from .dsc_deletion import delete_dsc
 
+
+def add_dsc_to_store(dsc: str):
+    try:
+        dscs = data_store.spec["created_dscs"]
+    except KeyError:
+        dscs = []
+        data_store.spec["created_dscs"] = dscs
+    dscs.append(dsc)
 
 @step("create a valid DSC")
 def create_valid_dsc():
@@ -66,15 +75,16 @@ def upload_public_key():
     response = requests.post(url=baseurl + "/signerCertificate", data=signedDsc, headers=headers, cert=(
         path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
     data_store.scenario["response"] = response
+    # for cleanup later
+    if response.ok:
+        add_dsc_to_store(signedDsc)
 
 
-@step("upload DSC as text")
-def upload_dsc_as_text():
-    signedDsc = data_store.scenario["signed_dsc"]
-    headers = {"Content-Type": "text/plain"}
-    response = requests.post(url=baseurl + "/signerCertificate", data=signedDsc, headers=headers, cert=(
-        path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
-    data_store.scenario["response"] = response
+@step("create custom authentication certificate")
+def create_custom_authentication_certificate():
+    (cert, key) = create_certificate()
+    data_store.scenario["auth_cert"] = cert
+    data_store.scenario["auth_key"] = key
 
 
 @step("upload unsigned DSC")
@@ -88,29 +98,32 @@ def upload_unsigned_dsc():
     data_store.scenario["response"] = response
 
 
-@step("check that DSC is in trustlist")
-def check_dsc_is_in_trustlist():
-    response = requests.get(url=baseurl + "/trustList", cert=(
-        path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
-    assert response.status_code == 200, "Coudn't get trustlist"
-    data = response.json()
-    certs_in_trustlist = [x["rawData"] for x in data]
-    dscRaw = b64encode(data_store.scenario["dsc"].public_bytes(
-        serialization.Encoding.DER)).decode('UTF-8')
-
-    assert dscRaw in certs_in_trustlist, "DSC not in trustlist"
-
-
-@step("upload DSC without client certificate")
-def upload_dsc_without_client_certificate():
-    dsc_cert = data_store.scenario["dsc"]
-    upload_cert = x509.load_pem_x509_certificate(
-        open(path.join(certificateFolder, "upload.pem"), "rb").read())
-    upload_key = serialization.load_pem_private_key(
-        open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
-    body = create_cms(dsc_cert, upload_cert, upload_key)
+@step("upload DSC with custom client certificate")
+def upload_dsc_with_custom_client_certificate():
+    signedDsc = data_store.scenario["signed_dsc"]
+    authCert = data_store.scenario["auth_cert"]
+    authKey = data_store.scenario["auth_key"]
+    cert_location = path.join(certificateFolder, "custom_auth.pem")
+    key_location = path.join(certificateFolder, "custom_key_auth.pem")
+    with open(cert_location, "wb") as f:
+        f.write(authCert.public_bytes(serialization.Encoding.PEM))
+    with open(key_location, "wb") as f:
+        f.write(authKey.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ))
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64"}
-    response = requests.post(
-        url=baseurl + "/signerCertificate", data=body, headers=headers)
+    response = requests.post(url=baseurl + "/signerCertificate",
+                             data=signedDsc, headers=headers, cert=(cert_location, key_location))
     data_store.scenario["response"] = response
+
+@step("delete all created certificates")
+def delete_all_created_certificates():
+    try:
+        signedDscs: List[Certificate] = data_store.spec["created_dscs"]
+        for dsc in signedDscs:
+            delete_dsc(dsc, authCerts)
+    except KeyError:
+        return

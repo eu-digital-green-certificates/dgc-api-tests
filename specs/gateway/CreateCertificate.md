@@ -16,15 +16,16 @@ Upload a DSC for a country
 * check that the response had no error
 * check that DSC is in trustlist
 
-## upload DSC without client certificate
+## upload DSC with unauthorized client certificate
 
 tags: negative_test
 
-Upload a DSC of a country without a client certificate. The response should be with the status code 401 Unauthorized
+Upload a DSC of a country with an unauthorized client certificate. The response should be with the status code 401 Unauthorized
 
 * create a valid DSC
 * sign DSC with UPLOAD certificate
-* upload DSC without client certificate
+* create custom authentication certificate
+* upload DSC with custom client certificate
 * check that the response had an error
 * check that the response had the status code "401"
 
@@ -32,24 +33,24 @@ Upload a DSC of a country without a client certificate. The response should be w
 
 tags: negative_test
 
-Upload a DSC signed with CSCA certificate of a different country. The response code should be 403 Forbidden
+Upload a DSC signed with CSCA certificate of a different country. The response code should be 400
 
 * create a DSC for another country
 * sign DSC with UPLOAD certificate of another country
 * upload DSC
 * check that the response had an error
-* check that the response had the status code "403"
+* check that the response had the status code "400"
 
 ## upload DSC in a wrong format
 
 tags: negative_test
 
-Upload a DSC of a country with the wrong format to trigger Error Code 406
+Upload a DSC of a country with the wrong format to trigger Error Code 400
 
 * create a valid DSC
 * upload unsigned DSC
 * check that the response had an error
-* check that the response had the status code "406"
+* check that the response had the status code "400"
 
 ## upload DSC two times
 
@@ -63,3 +64,6 @@ Upload a DSC of a country with a UUID which is already in the database. The API 
 * upload DSC
 * check that the response had an error
 * check that the response had the status code "409"
+
+___
+* delete all created certificates
