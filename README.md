@@ -14,6 +14,7 @@
 
 <p align="center">
   <a href="#about">About</a> •
+  <a href="#installation">Installation</a> •
   <a href="#support-and-feedback">Support</a> •
   <a href="#how-to-contribute">Contribute</a> •
   <a href="#contributors">Contributors</a> •
@@ -26,6 +27,10 @@ This repository contains automated API Test cases.
 
 The test specification is written with gauge and are used to verify that the [Digital Green Certificates Gateway (DGCG)](https://github.com/eu-digital-green-certificates/dgc-gateway) is working correctly.
 
+## Installation
+
+Install instructions can be found in [Installation.md](./Installation.md)
+
 ## Support and feedback
 
 The following channels are available for discussions, feedback, and support requests:
@@ -35,11 +40,11 @@ The following channels are available for discussions, feedback, and support requ
 | **API Tests issues**    | <a href="/../../issues" title="Open Issues"><img src="https://img.shields.io/github/issues/eu-digital-green-certificates/dgc-api-tests?style=flat"></a>  |
 | **Other requests**    | <a href="mailto:opensource@telekom.de" title="Email DGC Team"><img src="https://img.shields.io/badge/email-DGC%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
 
-## How to contribute  
+## How to contribute
 
 Contribution and feedback is encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](./CONTRIBUTING.md). By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
 
-## Contributors  
+## Contributors
 
 Our commitment to open source means that we are enabling -in fact encouraging- all interested parties to contribute and become part of its developer community.
 
