@@ -4,11 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-getgauge = "*"
+getgauge = "==0.3.7"
 requests = "*"
 cryptography = "*"
 
 [dev-packages]
 
-[requires]
-python_version = "3.9"
