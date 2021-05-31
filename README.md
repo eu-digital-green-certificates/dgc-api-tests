@@ -1,5 +1,5 @@
 <h1 align="center">
-    EU Digital Green Certificates API Tests
+   EU Digital COVID Certificate API Tests
 </h1>
 
 <p align="center">
@@ -25,7 +25,7 @@
 
 This repository contains automated API Test cases.
 
-The test specification is written with gauge and are used to verify that the [Digital Green Certificates Gateway (DGCG)](https://github.com/eu-digital-green-certificates/dgc-gateway) is working correctly.
+The test specification is written with gauge and are used to verify that the [EU Digital COVID Certificate Gateway (DGCG)](https://github.com/eu-digital-green-certificates/dgc-gateway) is working correctly.
 
 ## Installation
 
