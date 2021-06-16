@@ -6,7 +6,7 @@ all tests for uploading DSCs
 
 ## upload DSC
 
-tags:
+tags: 
 
 Upload a DSC for a country
 

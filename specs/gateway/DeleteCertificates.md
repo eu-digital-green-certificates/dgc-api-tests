@@ -6,7 +6,7 @@ All test cases for revoking certificates
 
 ## delete a dsc created
 
-tags:
+tags: 
 
 Revoke a DSC certificate of a country
 
