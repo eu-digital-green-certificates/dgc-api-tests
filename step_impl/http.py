@@ -14,21 +14,20 @@
 # limitations under the License.
 # ---license-end
 
-from getgauge.python import step, data_store
+from getgauge.python import data_store, step
+from requests import Response
 
 
 @step("check that the response had no error")
 def check_that_the_response_had_no_error():
-    response = data_store.scenario["response"]
-    status_code = response.status_code
-    assert 200 <= status_code and status_code <= 299, "Response Code had an error but it shoudn't"
+    response: Response = data_store.scenario["response"]
+    assert response.ok, "Response Code had an error but it shoudn't"
 
 
 @step("check that the response had an error")
 def check_that_the_response_had_an_error():
-    response = data_store.scenario["response"]
-    status_code = response.status_code
-    assert status_code <= 200 or 299 <= status_code, "Response Code had no error but it should"
+    response: Response = data_store.scenario["response"]
+    assert not response.ok, "Response Code had no error but it should"
 
 
 @step("check that the response had the status code <int>")
@@ -37,3 +36,28 @@ def check_that_the_response_had_the_status_code(expected):
     status_code = response.status_code
     assert status_code == int(
         expected), f"response status code was {status_code} but expected {expected}"
+
+
+@step("check that the response is not empty")
+def check_that_the_response_is_not_empty():
+    response: Response = data_store.scenario["response"]
+    assert response.text != "", "response was empty"
+
+
+@step("check that all repsonses had no error")
+def check_that_all_repsonses_had_no_error():
+    responses: List[Response] = data_store.scenario["responses"]
+    for response in responses:
+        assert response.ok, "Response Code had an error but it shoudn't"
+
+
+@step("check that all repsonses had an error")
+def check_that_all_repsonses_had_an_error():
+    assert False, "Add implementation code"
+
+
+@step("check that all responses had the status code <200>")
+def check_that_all_responses_had_the_status_code(expected):
+    responses: List[Response] = data_store.scenario["responses"]
+    for response in responses:
+        assert not response.ok, "Response Code had no error but it should"

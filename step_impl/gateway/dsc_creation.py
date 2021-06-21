@@ -37,6 +37,7 @@ def add_dsc_to_store(dsc: str):
         data_store.spec["created_dscs"] = dscs
     dscs.append(dsc)
 
+
 @step("create a valid DSC")
 def create_valid_dsc():
     csca_cert = x509.load_pem_x509_certificate(
@@ -101,6 +102,16 @@ def create_custom_authentication_certificate():
     (cert, key) = create_certificate()
     data_store.scenario["auth_cert"] = cert
     data_store.scenario["auth_key"] = key
+    cert_location = path.join(certificateFolder, "custom_auth.pem")
+    key_location = path.join(certificateFolder, "custom_key_auth.pem")
+    with open(cert_location, "wb") as f:
+        f.write(cert.public_bytes(serialization.Encoding.PEM))
+    with open(key_location, "wb") as f:
+        f.write(key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ))
 
 
 @step("upload unsigned DSC")
@@ -117,23 +128,14 @@ def upload_unsigned_dsc():
 @step("upload DSC with custom client certificate")
 def upload_dsc_with_custom_client_certificate():
     signedDsc = data_store.scenario["signed_dsc"]
-    authCert = data_store.scenario["auth_cert"]
-    authKey = data_store.scenario["auth_key"]
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    with open(cert_location, "wb") as f:
-        f.write(authCert.public_bytes(serialization.Encoding.PEM))
-    with open(key_location, "wb") as f:
-        f.write(authKey.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        ))
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64"}
     response = requests.post(url=baseurl + "/signerCertificate",
                              data=signedDsc, headers=headers, cert=(cert_location, key_location))
     data_store.scenario["response"] = response
+
 
 @step("delete all created certificates")
 def delete_all_created_certificates():

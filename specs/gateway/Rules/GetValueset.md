@@ -1,6 +1,6 @@
 # Get Valueset
 
-tags: DGC_GW
+tags: DGC_GW, Valueset
 
 All tests to check the download of Valuesets
 
@@ -8,23 +8,25 @@ All tests to check the download of Valuesets
 
 Get All Valuesets. Response code should be 200.
 
-* get all valuesets
+* get all valuesets IDs
+* check that the response is not empty
 * check that the response had no error
 * check that the response had the status code "200"
 
 ## Get specific Valueset
 
-Get data of a specific valueset. The test first downloads all Valuesets
+Get data of a specific Valueset. The test first downloads all Valuesets and then checks if it can download the specirif Valueset.
 
-* get all valuesets
-* get details of first valueset in list
+* get all valuesets IDs
+* get details of first Valueset in list
+* check that the response is not empty
 * check that the response had no error
 
-## Get Valueset with unauthenticated certificate
+## Get Valueset with unauthenticated NBTLS
 
 tags: negative_test
 
-Use an unauthorized certificate to try to authenticate when downloading the Valuesets
+Use an NBTLS to try to authenticate when downloading the Valuesets
 
 * create custom authentication certificate
 * get all valuesets with custom certificate
