@@ -1,6 +1,3 @@
-from os import path
-from random import choice
-
 # ---license-start
 # eu-digital-green-certificates / dgc-api-tests
 # ---
@@ -16,13 +13,15 @@ from random import choice
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ---license-end
+from os import path
+from random import choice
 
 import requests
+from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
 
 from . import authCerts, baseurl, certificateFolder
-from cryptography.hazmat.primitives import serialization
 
 
 def delete_dsc(signedDsc: str, authCerts: (str, str)):

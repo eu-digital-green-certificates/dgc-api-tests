@@ -37,12 +37,20 @@ def get_all_valuesets_with_custom_certificate():
         cert_location, key_location))
     data_store.scenario["response"] = response
 
-
+def get_valueset_by_id(valuesetId):
+    return requests.get(baseurl + f"/valuesets/{valuesetId}", cert=(
+        path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
 @step("get details of first Valueset in list")
 def get_details_of_first_valueset_in_list():
     response: Response = data_store.scenario["response"]
     valueSetIds = response.json()
     valueSetId = valueSetIds[0]
-    response = requests.get(baseurl + f"/valuesets/{valueSetId}", cert=(
-        path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
+    response = get_valueset_by_id(valueSetId)
     data_store.scenario["response"] = response
+
+@step("get all valuesets")
+def get_all_valuesets():
+    response: Response = data_store.scenario["response"]
+    valueSetIds = response.json()
+    valueSets = [get_valueset_by_id(valuesetId) for valuesetId in valueSetIds]
+    data_store.scenario["responses"] = valueSets

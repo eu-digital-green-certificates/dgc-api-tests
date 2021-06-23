@@ -12,6 +12,10 @@ Get All Valuesets. Response code should be 200.
 * check that the response is not empty
 * check that the response had no error
 * check that the response had the status code "200"
+* get all valuesets
+* check that all responses are not empty
+* check that all responses had no error
+* check that all responses had the status code "200"
 
 ## Get specific Valueset
 

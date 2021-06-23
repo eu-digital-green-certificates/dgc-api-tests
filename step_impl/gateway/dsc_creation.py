@@ -25,7 +25,7 @@ from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
 
 from . import baseurl, certificateFolder, authCerts
-from .certificates import create_cms, create_dsc, create_certificate
+from ..util.certificates import create_cms_with_certificate, create_dsc, create_certificate
 from .dsc_deletion import delete_dsc
 
 
@@ -68,7 +68,7 @@ def sign_dsc_with_upload_certificate():
     upload_key = serialization.load_pem_private_key(
         open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
 
-    data_store.scenario["signed_dsc"] = create_cms(
+    data_store.scenario["signed_dsc"] = create_cms_with_certificate(
         dsc_cert, upload_cert, upload_key)
 
 
@@ -80,7 +80,7 @@ def sign_dsc_with_upload_certificate_of_another_country():
     upload_key = serialization.load_pem_private_key(
         open(path.join(certificateFolder, "secondCountry", "key_upload.pem"), "rb").read(), None)
 
-    data_store.scenario["signed_dsc"] = create_cms(
+    data_store.scenario["signed_dsc"] = create_cms_with_certificate(
         dsc_cert, upload_cert, upload_key)
 
 

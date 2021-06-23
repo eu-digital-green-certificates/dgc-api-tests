@@ -21,13 +21,13 @@ from requests import Response
 @step("check that the response had no error")
 def check_that_the_response_had_no_error():
     response: Response = data_store.scenario["response"]
-    assert response.ok, "Response Code had an error but it shoudn't"
+    assert response.ok, f"Response Code had an error but it shoudn't. Status Code {response.status_code}"
 
 
 @step("check that the response had an error")
 def check_that_the_response_had_an_error():
     response: Response = data_store.scenario["response"]
-    assert not response.ok, "Response Code had no error but it should"
+    assert not response.ok, f"Response Code had no error but it should. Status Code {response.status_code}"
 
 
 @step("check that the response had the status code <int>")
@@ -44,7 +44,7 @@ def check_that_the_response_is_not_empty():
     assert response.text != "", "response was empty"
 
 
-@step("check that all repsonses had no error")
+@step("check that all responses had no error")
 def check_that_all_repsonses_had_no_error():
     responses: List[Response] = data_store.scenario["responses"]
     for response in responses:
@@ -61,3 +61,10 @@ def check_that_all_responses_had_the_status_code(expected):
     responses: List[Response] = data_store.scenario["responses"]
     for response in responses:
         assert not response.ok, "Response Code had no error but it should"
+
+
+@step("check that all responses are not empty")
+def check_that_all_responses_are_not_empty():
+    responses: List[Response] = data_store.scenario["responses"]
+    for response in responses:
+        assert response.text != "", "response was empty"

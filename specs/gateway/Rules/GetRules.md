@@ -30,7 +30,7 @@ Download Rules of all Countries.
 
 * get all onboarded countries
 * download rules of all countries
-* check that all repsonses had no error
+* check that all responses had no error
 * check that all responses had the status code "200"
 
 
