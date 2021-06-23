@@ -16,10 +16,9 @@
 from os import path
 
 import requests
-from requests import Response
 from getgauge.python import data_store, step
-
-from .. import baseurl, certificateFolder
+from requests import Response
+from step_impl.util import baseurl, certificateFolder
 
 
 @step("get all valuesets IDs")

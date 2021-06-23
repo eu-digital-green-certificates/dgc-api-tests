@@ -25,12 +25,11 @@ from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.x509.oid import NameOID
 from getgauge.python import data_store, step
-from step_impl.gateway.Rules.rule_get import (download_rule_of_country,
-                                              get_rule_id_list)
 from step_impl.util import baseurl, certificateFolder
 from step_impl.util.certificates import create_cms
 from step_impl.util.json import DateTimeEncoder
-from step_impl.util.rules import delete_rule_by_id_with_base_data
+from step_impl.util.rules import (delete_rule_by_id_with_base_data,
+                                  download_rule_of_country, get_rule_id_list)
 
 
 def add_rule_to_store(rule):

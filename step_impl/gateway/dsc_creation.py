@@ -23,10 +23,11 @@ from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
-
-from . import baseurl, certificateFolder, authCerts
-from ..util.certificates import create_cms_with_certificate, create_dsc, create_certificate
-from .dsc_deletion import delete_dsc
+from step_impl.gateway.dsc_deletion import delete_dsc
+from step_impl.util import authCerts, baseurl, certificateFolder
+from step_impl.util.certificates import (create_certificate,
+                                         create_cms_with_certificate,
+                                         create_dsc)
 
 
 def add_dsc_to_store(dsc: str):

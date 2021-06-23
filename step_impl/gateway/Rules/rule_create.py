@@ -19,15 +19,13 @@ from os import getcwd, path
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from getgauge.python import data_store, step
-from step_impl.gateway import certificateFolder
+from step_impl.util import certificateFolder
+from step_impl.util.certificates import get_own_country_name
 
 
 @step("create a valid Invalidation Rule")
 def create_a_valid_invalidation_rule():
-    csca = x509.load_pem_x509_certificate(
-        open(path.join(certificateFolder, "csca.pem"), "rb").read())
-    countryName = csca.subject.get_attributes_for_oid(NameOID.COUNTRY_NAME)[
-        0].value
+    countryName = get_own_country_name()
     ValidFrom = datetime.now() + timedelta(days=2, seconds=10)
     ValidTo = ValidFrom + timedelta(days=5)
     # rule mostly from examole in spedification

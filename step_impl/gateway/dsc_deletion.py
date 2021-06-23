@@ -20,8 +20,7 @@ import requests
 from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
-
-from . import authCerts, baseurl, certificateFolder
+from step_impl.util import authCerts, baseurl, certificateFolder
 
 
 def delete_dsc(signedDsc: str, authCerts: (str, str)):
