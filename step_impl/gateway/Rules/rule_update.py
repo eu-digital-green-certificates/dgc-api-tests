@@ -42,8 +42,7 @@ def check_that_rule_has_the_new_version():
     scenarioRule = rule = data_store.scenario["rule"]
     newVersion = data_store.scenario["new_version"]
     rules = get_rules_from_rulelist(ruleList)
-    ruleData = rules[scenarioRule["Identifier"]]
-    rule = get_rule_from_cms(ruleData["cms"])
+    rule = [rule for rule in rules if rule["Identifier"] == scenarioRule["Identifier"]][0]
     assert rule['Version'] == newVersion, f"expected version to be {newVersion} but was {rule['Version']}"
 
 

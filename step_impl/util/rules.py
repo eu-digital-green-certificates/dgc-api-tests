@@ -1,8 +1,10 @@
 import json
+from base64 import b64decode
 from os import path
 from typing import List
 
 import requests
+from asn1crypto.cms import ContentInfo
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
@@ -22,17 +24,18 @@ def get_rule_id_list(ruleList) -> List[str]:
 
 
 def get_rule_from_cms(cms: bytes):
-    signedData = cms.ContentInfo.load(cms)
+    signedData = ContentInfo.load(cms)
     ruleJson = signedData['content']['encap_content_info']['content'].native
     return json.loads(ruleJson)
 
+
 def get_rules_from_rulelist(rulelist):
-    rulesCms = [rule[-1]["cms"] for rule in rulelist]
-    return [get_rule_from_cms(cms) for cms in rulesCms]
+    rulesCms = [rule[-1]["cms"] for rule in rulelist.values()]
+    return [get_rule_from_cms(b64decode(cms)) for cms in rulesCms]
 
 
 def delete_rule_by_id(ruleId: str, upload_cert: Certificate, upload_key: RSAPrivateKey, tls_cert_location: str, tls_key_location: str) -> Response:
-    data = create_cms(ruleId, upload_cert, upload_key)
+    data = create_cms(ruleId.encode("utf-8"), upload_cert, upload_key)
     headers = {"Content-Type": "application/cms-text",
                "Content-Transfer-Encoding": "base64"}
     response = requests.delete(url=baseurl + "/rules",
@@ -47,7 +50,7 @@ def delete_rule_by_id_with_base_data(ruleId: str) -> Response:
         open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
     tls_cert_location = path.join(certificateFolder, "auth.pem")
     tls_key_location = path.join(certificateFolder, "key_auth.pem")
-    data = create_cms(ruleId, upload_cert, upload_key)
+    data = create_cms(ruleId.encode('utf-8'), upload_cert, upload_key)
     headers = {"Content-Type": "application/cms-text",
                "Content-Transfer-Encoding": "base64"}
     response = requests.delete(url=baseurl + "/rules",

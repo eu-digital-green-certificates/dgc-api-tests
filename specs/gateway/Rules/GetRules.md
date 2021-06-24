@@ -22,7 +22,7 @@ Get all onboarded countries with unauthenticated NBTLS. Should lead to an error.
 * create custom authentication certificate
 * get all onboarded countries with custom certificate
 * check that the response had an error
-* check that the response had the status code "400"
+* check that the response had the status code "401"
 
 ## download all rules
 
@@ -44,4 +44,4 @@ Get Rules from any country with an unauthenticated NBTLS. Should lead to an erro
 * create custom authentication certificate
 * download rules of all countries with custom certificate
 * check that all repsonses had an error
-* check that all responses had the status code "400"
+* check that all responses had the status code "401"

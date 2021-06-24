@@ -61,6 +61,9 @@ def upload_rule():
     response = requests.post(url=baseurl + "/rules",
                              data=data, headers=headers, cert=(cert_location, key_location))
     data_store.scenario["response"] = response
+    # for cleanup later
+    if response.ok:
+        add_rule_to_store(data_store.scenario["rule"])
 
 
 @step("upload Rule with custom authentication certificate")
@@ -98,8 +101,10 @@ def check_that_rule_is_in_rulelist():
         0].value
     cert_location = path.join(certificateFolder, "auth.pem")
     key_location = path.join(certificateFolder, "key_auth.pem")
-    ruleList = download_rule_of_country(
+    ruleListResponse = download_rule_of_country(
         countryName, cert_location, key_location)
+    assert ruleListResponse.ok, f"didn't get a rulelist. Status Code {ruleListResponse.status_code}"
+    ruleList = ruleListResponse.json()
     ruleIdList = get_rule_id_list(ruleList)
     rule = data_store.scenario["rule"]
     ruleId = rule["Identifier"]
@@ -119,7 +124,7 @@ def check_that_rule_is_not_in_rulelist():
     ruleIdList = get_rule_id_list(ruleListResponse.json())
     rule = data_store.scenario["rule"]
     ruleId = rule["Identifier"]
-    assert not ruleId in ruleIdList, f"ruleId '{ruleId}' not in Rulelist '{', '.join(ruleIdList)}'"
+    assert not ruleId in ruleIdList, f"ruleId '{ruleId}' should not be in Rulelist '{', '.join(ruleIdList)}'"
 
 @step("delete all created rules")
 def delete_all_created_rules():

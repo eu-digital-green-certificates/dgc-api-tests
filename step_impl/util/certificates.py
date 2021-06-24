@@ -34,14 +34,13 @@ def get_country_name_from_certificate(cert: Certificate) -> str:
 def get_own_country_name() -> str:
     csca_cert = x509.load_pem_x509_certificate(
         open(path.join(certificateFolder, "csca.pem"), "rb").read())
-    return get_country_name_from_certificate
+    return get_country_name_from_certificate(csca_cert)
 
 def create_certificate(signing_cert: Certificate = None, signing_key: Certificate = None):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
     if signing_cert != None:
-        countryName = signing_cert.subject.get_attributes_for_oid(NameOID.COUNTRY_NAME)[
-            0].value
+        countryName = get_country_name_from_certificate(signing_cert)
     else:
         countryName = u"DE"
 

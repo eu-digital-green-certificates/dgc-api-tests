@@ -12,7 +12,7 @@ Update a Rule created to a new version.
 * upload Rule
 * update Rule to new version
 * check that the response had no error
-* check that the response had the status code "200"
+* check that the response had the status code "201"
 * get Rules of own Country
 * check that Rule has the new version
 
@@ -25,7 +25,7 @@ Update a Rule with a Rule lower than the current version. There should be an err
 * create a valid Invalidation Rule
 * upload Rule
 * update Rule to new version with lower version number
-* check that the response had no error
+* check that the response had an error
 * check that the response had the status code "400"
 
 ## update Rule Rule without semver
@@ -37,7 +37,7 @@ Update a Rule without following the semantic versioning scheme (e.g. 1.3 instead
 * create a valid Invalidation Rule
 * upload Rule
 * update Rule with version in wrong format
-* check that the response had no error
+* check that the response had an error
 * check that the response had the status code "400"
 
 ___

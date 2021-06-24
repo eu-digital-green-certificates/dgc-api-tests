@@ -40,6 +40,7 @@ def get_all_onboarded_countries_with_custom_certificate():
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
     response = requests.get(url=baseurl + "/countrylist",
                             cert=(cert_location, key_location))
+    data_store.scenario["response"] = response
 
 
 @step("check that own country is in onboared countries list")
@@ -61,7 +62,7 @@ def download_rules_of_all_countries():
     key_location = path.join(certificateFolder, "key_auth.pem")
     responses = [download_rule_of_country(
         country, cert_location, key_location) for country in countries]
-    data_store.scenario["responses"]
+    data_store.scenario["responses"] = responses
 
 
 @step("download rules of all countries with custom certificate")
@@ -72,7 +73,7 @@ def download_rules_of_all_countries_with_custom_certificate():
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
     responses = [requests.get(url=baseurl + f"/rules/{country}", cert=(
         cert_location, key_location)) for country in countries]
-    data_store.scenario["responses"]
+    data_store.scenario["responses"] = responses
 
 
 @step("get acceptance Rule from Rule list of own country")
@@ -82,6 +83,10 @@ def get_acceptance_rule_from_rule_list_of_own_country():
     key_location = path.join(certificateFolder, "key_auth.pem")
     response = download_rule_of_country(
         countryName, cert_location, key_location)
+    assert response.ok, f"response had an error. Status code {response.status_code}"
+    rules = get_rules_from_rulelist(response.json())
+    rule = [rule for rule in rules if rule["Type"] == "Acceptance"][0]
+    data_store.scenario["rule"] = rule
 
 
 @step("get Rules of own Country")

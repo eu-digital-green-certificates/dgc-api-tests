@@ -11,7 +11,7 @@ Upload a valid invalidation Rule. Invalidation Rule is used because it can be de
 * create a valid Invalidation Rule
 * upload Rule
 * check that the response had no error
-* check that the response had the status code "200"
+* check that the response had the status code "201"
 * check that Rule is in Rulelist
 
 ## upload Rule with unauthenticated certificate

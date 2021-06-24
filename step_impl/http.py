@@ -53,14 +53,16 @@ def check_that_all_repsonses_had_no_error():
 
 @step("check that all repsonses had an error")
 def check_that_all_repsonses_had_an_error():
-    assert False, "Add implementation code"
+    responses: List[Response] = data_store.scenario["responses"]
+    for response in responses:
+        assert not response.ok, "Response Code had no error but it should"
 
 
 @step("check that all responses had the status code <200>")
 def check_that_all_responses_had_the_status_code(expected):
     responses: List[Response] = data_store.scenario["responses"]
     for response in responses:
-        assert not response.ok, "Response Code had no error but it should"
+        assert int(expected) == response.status_code, f"response code should be {expected} but it was {response.status_code}"
 
 
 @step("check that all responses are not empty")
