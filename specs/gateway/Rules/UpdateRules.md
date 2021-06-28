@@ -40,5 +40,20 @@ Update a Rule without following the semantic versioning scheme (e.g. 1.3 instead
 * check that the response had an error
 * check that the response had the status code "400"
 
+## Update Rule with ValidFrom less than ValidFrom of older Version
+
+tags: negative_test
+
+Update Rule with ValidFrom less than ValidFrom of older Version
+
+* create a valid Invalidation Rule
+* upload Rule
+* change ValidTo to "1"h before the current ValidTo
+* update Rule to new version
+* check that the response had no error
+* check that the response had the status code "201"
+* get Rules of own Country
+* check that Rule has the new version
+
 ___
 * delete all created rules

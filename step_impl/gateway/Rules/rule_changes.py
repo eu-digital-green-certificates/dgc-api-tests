@@ -33,11 +33,24 @@ def change_countrycode_to_a_wrong_format():
 @step("change countrycode to a wrong country")
 def change_countrycode_to_a_wrong_country():
     def change_to_wrong_country(rule):
-        if (rule["Country"] == "en"):
-            rule["Country"] = "de"
+        if (rule["Country"] == "EN"):
+            rule["Country"] = "DE"
         else:
-            rule["Country"] = "en"
+            rule["Country"] = "EN"
     change_rule(change_to_wrong_country)
+
+
+@step("change countrycode in Identifier to a wrong country")
+def change_countrycode_in_identifier_to_a_wrong_country():
+    def change_rule_identifier_to_wrong_country(rule):
+        ruleId = rule["Identifier"]
+        currentCountry = ruleId[3:5]
+        if ( currentCountry == "EN"):
+            newCountry = "DE"
+        else:
+            newCountry = "EN"
+        rule["Identifier"] = ruleId[:3]+newCountry+ruleId[5:]
+    change_rule(change_rule_identifier_to_wrong_country)
 
 
 @step("change ValidFrom less than <48>h")
@@ -47,17 +60,6 @@ def change_validfrom_less_than_h(hourStr: str):
     def change_valid_from(rule):
         # substract some time so that it definitly is less than
         rule["ValidFrom"] = datetime.now() + timedelta(hours=changeHours) - \
-            timedelta(seconds=5)
-    change_rule(change_valid_from)
-
-
-@step("change ValidTo less than <72>h")
-def change_validto_less_than_h(hourStr: str):
-    changeHours = int(hourStr)
-
-    def change_valid_from(rule):
-        # substract some time so that it definitly is less than
-        rule["ValidTo"] = datetime.now() + timedelta(hours=changeHours) - \
             timedelta(seconds=5)
     change_rule(change_valid_from)
 
@@ -95,3 +97,25 @@ def set_version_of_the_schema_to(version):
     def change_schema_version(rule):
         rule["SchemaVersion"] = version
     change_rule(change_schema_version)
+
+@step("set ValidFrom more than <14> days in the future")
+def set_validfrom_more_than_days_in_the_future(dayStr):
+    changeDays = int(dayStr)
+
+    def change_valid_from(rule):
+        rule["ValidFrom"] = datetime.now() + timedelta(days=changeDays)
+    change_rule(change_valid_from)
+
+@step("set ValidFrom after ValidTo value")
+def set_validfrom_after_validto_value():
+    def change_valid_to_before_valid_from(rule):
+        rule["ValidTo"] = rule["ValidFrom"] - timedelta(hours=2)
+    change_rule(change_valid_to_before_valid_from)
+
+@step("change ValidTo to <1>h before the current ValidTo")
+def change_validto_to_1h_before_the_current_validto(hoursStr):
+    hours = int(hoursStr)
+    def change_valid_to(rule):
+        rule["ValidTo"] = rule["ValidTo"] - timedelta(hours=hours)
+    change_rule(change_valid_to)
+

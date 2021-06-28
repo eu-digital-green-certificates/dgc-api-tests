@@ -4,35 +4,29 @@ tags: DGC_GW, Rules
 
 Test for deletion of the rules
 
-## delete invalidation Rule
+   |Ruletype    |
+   |------------|
+   |Acceptance  |
+   |Invalidation|
 
-Delete an Invalidation Rule. This should be no problem as Invalidation Rules can be deleted.
+## delete Rule
 
-* create a valid Invalidation Rule
+Delete a Rule.
+
+* create a valid <Ruletype> Rule
 * upload Rule
 * check that Rule is in Rulelist
 * delete Rule
 * check that the response had no error
 * check that Rule is not in Rulelist
 
-## delete acceptance Rule
+## delete Rule of another country
 
 tags: negative_test
 
-Delete an Acceptance Rule. This should be an error because Acceptance Rules cannot be deleted.
+Delete a Rule of another country. This should not be possible.
 
-* get acceptance Rule from Rule list of own country
-* delete Rule
-* check that the response had an error
-* check that Rule is in Rulelist
-
-## delete invalidation Rule of another country
-
-tags: negative_test
-
-Delete an Invalidation Rule of another country. This should not be possible.
-
-* create a valid Invalidation Rule
+* create a valid <Ruletype> Rule
 * upload Rule
 * check that Rule is in Rulelist
 * delete Rule with certificate of another country
@@ -44,9 +38,9 @@ Delete an Invalidation Rule of another country. This should not be possible.
 
 tags: negative_test
 
-Delete an Invalidation Rule with unauthenticated certificate. This should not be possible.
+Delete a Rule with unauthenticated certificate. This should not be possible.
 
-* create a valid Invalidation Rule
+* create a valid <Ruletype> Rule
 * upload Rule
 * check that Rule is in Rulelist
 * create custom authentication certificate

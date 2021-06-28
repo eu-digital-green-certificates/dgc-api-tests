@@ -22,16 +22,16 @@ from getgauge.python import data_store, step
 from step_impl.util import certificateFolder
 from step_impl.util.certificates import get_own_country_name
 
-
-@step("create a valid Invalidation Rule")
-def create_a_valid_invalidation_rule():
+@step("create a valid <Ruletype> Rule")
+def create_a_valid_rule(ruletype):
     countryName = get_own_country_name()
     ValidFrom = datetime.now() + timedelta(days=2, seconds=10)
     ValidTo = ValidFrom + timedelta(days=5)
-    # rule mostly from examole in spedification
+    RuleID = "GR" if ruletype=="Acceptance" else "IR"
+    # rule mostly from examole in specification
     rule = {
-        "Identifier": f"IR-{countryName}-0001",
-        "Type": "Invalidation",
+        "Identifier": f"{RuleID}-{countryName}-0001",
+        "Type": ruletype,
         "Country": countryName,
         "Version": "1.0.0",
         "SchemaVersion": "1.0.0",
