@@ -66,9 +66,17 @@ def change_validfrom_less_than_h(hourStr: str):
 
 @step("remove description of the Rule")
 def remove_description_of_the_rule():
-    def change_countrycode(rule):
+    def remove_description(rule):
         rule["Description"] = []
-    change_rule(change_countrycode)
+    change_rule(remove_description)
+
+
+@step("change description to have less than <20> characters")
+def change_description_to_have_less_than_characters(strLength):
+    def change_description(rule):
+        rule["Description"] = [
+            {"lang": "en", "desc": "api-test-rule for use in api test"[:(int(strLength)-1)]}]
+    change_rule(change_description)
 
 
 @step("use only german in the description of the Rule")
@@ -82,7 +90,7 @@ def use_only_german_in_the_description_of_the_rule():
 @step("add language <en-> in description")
 def add_language_in_description(language: str):
     def change_description(rule):
-        rule["Description"] = [{"lang": "en", "desc": "api-test-rule for use in api test"}, {
+        rule["Description"] = [{"lang": language, "desc": "api-test-rule for use in api test"}, {
             "lang": language, "desc": "api-test-rule for use in api test"}]
     change_rule(change_description)
 
@@ -118,4 +126,25 @@ def change_validto_to_1h_before_the_current_validto(hoursStr):
     def change_valid_to(rule):
         rule["ValidTo"] = rule["ValidTo"] - timedelta(hours=hours)
     change_rule(change_valid_to)
+
+
+def change_version_to(version):
+    def change_version(rule):
+        rule["Version"] = version
+        data_store.scenario["new_version"] = version
+    return change_version
+@step("change Rule to new version")
+def change_rule_to_new_version():
+    newVersion = "1.0.1"
+    change_rule(change_version_to(newVersion))
+
+@step("change Rule to lower version")
+def change_rule_to_lower_version():
+    newVersion = "0.9.0"
+    change_rule(change_version_to(newVersion))
+
+@step("change rule to version in wrong format")
+def change_rule_to_version_in_wrong_format():
+    newVersion = "10"
+    change_rule(change_version_to(newVersion))
 

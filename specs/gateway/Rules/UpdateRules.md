@@ -10,11 +10,26 @@ Update a Rule created to a new version.
 
 * create a valid Invalidation Rule
 * upload Rule
-* update Rule to new version
+* change Rule to new version
+* upload Rule
 * check that the response had no error
 * check that the response had the status code "201"
 * get Rules of own Country
 * check that Rule has the new version
+
+## update Rule to a new version and ValidFrom later than old rule
+
+Update a Rule created to a new version and ValidFrom value later than old rule. In the end both Versions of the rule should be downloaded.
+
+* create a valid Invalidation Rule
+* upload Rule
+* change Rule to new version
+* upload Rule
+* check that the response had no error
+* check that the response had the status code "201"
+* get Rules of own Country
+* check that Rule has the new version
+* check that both versions of the rule exist
 
 ## update Rule with lower version than the old Rule
 
@@ -24,7 +39,8 @@ Update a Rule with a Rule lower than the current version. There should be an err
 
 * create a valid Invalidation Rule
 * upload Rule
-* update Rule to new version with lower version number
+* change Rule to lower version
+* upload Rule
 * check that the response had an error
 * check that the response had the status code "400"
 
@@ -36,7 +52,8 @@ Update a Rule without following the semantic versioning scheme (e.g. 1.3 instead
 
 * create a valid Invalidation Rule
 * upload Rule
-* update Rule with version in wrong format
+* change rule to version in wrong format
+* upload Rule
 * check that the response had an error
 * check that the response had the status code "400"
 
@@ -49,7 +66,8 @@ Update Rule with ValidFrom less than ValidFrom of older Version
 * create a valid Invalidation Rule
 * upload Rule
 * change ValidTo to "1"h before the current ValidTo
-* update Rule to new version
+* change Rule to new version
+* upload Rule
 * check that the response had no error
 * check that the response had the status code "201"
 * get Rules of own Country

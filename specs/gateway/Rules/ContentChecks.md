@@ -62,6 +62,19 @@ A Rule must have a description. An empty description should be an error.
 * check that the response had the status code "400"
 * check that Rule is not in Rulelist
 
+## upload Rule with description text length smaller than 20 characters
+
+tags: negative_test
+
+A Rule must have a description. Those descriptions must have a length of at least 20 characters.
+
+* create a valid <Ruletype> Rule
+* change description to have less than "20" characters
+* upload Rule
+* check that the response had an error
+* check that the response had the status code "400"
+* check that Rule is not in Rulelist
+
 ## upload Rule with description filled with one language without english
 
 tags: negative_test
