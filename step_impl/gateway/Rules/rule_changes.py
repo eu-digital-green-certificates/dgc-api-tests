@@ -148,3 +148,26 @@ def change_rule_to_version_in_wrong_format():
     newVersion = "10"
     change_rule(change_version_to(newVersion))
 
+
+@step("change ValidFrom to <10>sec in the future")
+def change_validfrom_to_sec_in_the_future(secStr):
+    changeSeconds = int(secStr)
+
+    def change_valid_from(rule):
+        rule["ValidFrom"] = datetime.now() + timedelta(seconds=changeSeconds)
+    change_rule(change_valid_from)
+
+@step("change ValidTo to <15>sec in the future")
+def change_validto_to_sec_in_the_future(secStr):
+    changeSeconds = int(secStr)
+
+    def change_valid_to(rule):
+        rule["ValidFrom"] = datetime.now() + timedelta(seconds=changeSeconds)
+    change_rule(change_valid_to)
+
+@step("change CertificateType to be invalid")
+def change_certificatetype_to_be_invalid():
+    def change_valid_to(rule):
+        (ruleType,country,counter) = rule["Identifier"].split("-")
+        rule["CertificateType"] = "General" if ruleType=="VR" else "Vaccination"
+    change_rule(change_valid_to)

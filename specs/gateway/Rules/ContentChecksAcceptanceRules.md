@@ -17,5 +17,18 @@ Upload a Acceptance Rule which is valid ealier than 48h. There should be an erro
 * check that the response had the status code "400"
 * check that Rule is not in Rulelist
 
+## upload Rule with CertificateType not matching RuleId
+
+tags: negative_test
+
+Upload a Acceptance Rule where the CertificateType is not matching the Rule Identifier of the Rule
+
+* create a valid Acceptance Rule
+* change CertificateType to be invalid
+* upload Rule
+* check that the response had an error
+* check that the response had the status code "400"
+* check that Rule is not in Rulelist
+
 ___
 * delete all created rules
