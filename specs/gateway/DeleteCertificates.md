@@ -6,9 +6,9 @@ All test cases for revoking certificates
 
 ## delete a dsc created
 
-tags: 
+tags:
 
-Revoke a DSC certificate of a country
+Delete a DSC certificate of a country
 
 * create a valid DSC
 * sign DSC with UPLOAD certificate
@@ -16,6 +16,21 @@ Revoke a DSC certificate of a country
 * check that the response had no error
 * check that DSC is in trustlist
 * delete DSC created
+* check that the response had no error
+* check that DSC is not in trustlist
+
+## delete a dsc created with alias endpoint
+
+tags:
+
+Delete a DSC certificate of a country by using the POST endpoint. This is used so that a body can be used in a POST request instead of a DELETE request.
+
+* create a valid DSC
+* sign DSC with UPLOAD certificate
+* upload DSC
+* check that the response had no error
+* check that DSC is in trustlist
+* delete DSC created using alias Endpoint
 * check that the response had no error
 * check that DSC is not in trustlist
 

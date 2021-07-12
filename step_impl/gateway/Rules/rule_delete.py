@@ -26,7 +26,7 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
 from step_impl.util import baseurl, certificateFolder
 from step_impl.util.rules import delete_rule_by_id
-from step_impl.util.certificates import get_own_country_name
+from step_impl.util.certificates import create_cms, get_own_country_name
 
 
 
@@ -47,6 +47,25 @@ def delete_rule():
     key_location = path.join(certificateFolder, "key_auth.pem")
     delete_rule_by_id_for_teststeps(
         ruleId, upload_cert, upload_key, cert_location, key_location)
+
+
+@step("delete Rule using alias Endpoint")
+def delete_rule_using_alias_endpoint():
+    rule = data_store.scenario["rule"]
+    ruleId = rule["Identifier"]
+    upload_cert = x509.load_pem_x509_certificate(
+        open(path.join(certificateFolder, "upload.pem"), "rb").read())
+    upload_key = serialization.load_pem_private_key(
+        open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
+    data = create_cms(ruleId.encode("utf-8"), upload_cert, upload_key)
+    cert_location = path.join(certificateFolder, "auth.pem")
+    key_location = path.join(certificateFolder, "key_auth.pem")
+    headers = {"Content-Type": "application/cms-text",
+               "Content-Transfer-Encoding": "base64"}
+    response = requests.post(url=baseurl + "/rules/delete",
+                               data=data, headers=headers, cert=(cert_location, key_location))
+    data_store.scenario["response"] = response
+
 
 @step("delete Rule with certificate of another country")
 def delete_rule_with_certificate_of_another_country():

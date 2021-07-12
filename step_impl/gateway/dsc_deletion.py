@@ -38,6 +38,16 @@ def delete_dsc_created():
     data_store.scenario["response"] = response
 
 
+@step("delete DSC created using alias Endpoint")
+def delete_dsc_created_using_alias_endpoint():
+    signedDsc = data_store.scenario["signed_dsc"]
+    headers = {"Content-Type": "application/cms",
+               "Content-Transfer-Encoding": "base64"}
+    response = requests.post(
+        url=baseurl + "/signerCertificate/delete", data=signedDsc, headers=headers, cert=authCerts)
+    data_store.scenario["response"] = response
+
+
 @step("delete DSC from another country")
 def delete_dsc_from_another_country():
     delete_dsc_created()
