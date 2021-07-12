@@ -30,7 +30,7 @@ def create_a_valid_rule(ruletype):
     RuleID = "GR" if ruletype=="Acceptance" else "IR"
     # rule mostly from examole in specification
     rule = {
-        "Identifier": f"{RuleID}-{countryName}-0001",
+        "Identifier": f"{RuleID}-{countryName}-1001",
         "Type": ruletype,
         "Country": countryName,
         "Version": "1.0.0",
