@@ -66,6 +66,21 @@ def upload_rule():
         add_rule_to_store(data_store.scenario["rule"])
 
 
+@step("upload Rule with cms header")
+def upload_rule_with_cms_header():
+    data = get_signed_rule()
+    cert_location = path.join(certificateFolder, "auth.pem")
+    key_location = path.join(certificateFolder, "key_auth.pem")
+    headers = {"Content-Type": "application/cms",
+               "Content-Transfer-Encoding": "base64"}
+    response = requests.post(url=baseurl + "/rules",
+                             data=data, headers=headers, cert=(cert_location, key_location))
+    data_store.scenario["response"] = response
+    # for cleanup later
+    if response.ok:
+        add_rule_to_store(data_store.scenario["rule"])
+
+
 @step("upload Rule with custom authentication certificate")
 def upload_rule_with_custom_authentication_certificate():
     data = get_signed_rule()
@@ -89,8 +104,6 @@ def upload_rule_with_certificate_from_another_country():
     response = requests.post(url=baseurl + "/rules",
                              data=data, headers=headers, cert=(cert_location, key_location))
     data_store.scenario["response"] = response
-
-
 
 
 @step("check that Rule is in Rulelist")
@@ -125,6 +138,7 @@ def check_that_rule_is_not_in_rulelist():
     rule = data_store.scenario["rule"]
     ruleId = rule["Identifier"]
     assert not ruleId in ruleIdList, f"ruleId '{ruleId}' should not be in Rulelist '{', '.join(ruleIdList)}'"
+
 
 @step("delete all created rules")
 def delete_all_created_rules():

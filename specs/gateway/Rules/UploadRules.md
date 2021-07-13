@@ -19,6 +19,16 @@ Upload a valid invalidation Rule. Invalidation Rule is used because it can be de
 * check that the response had the status code "201"
 * check that Rule is in Rulelist
 
+## upload valid Rule with cms header
+
+The content type header of rules normally in the test is "application/cms-text" but it can also be "application/cms" like for the certificates
+
+* create a valid <Ruletype> Rule
+* upload Rule with cms header
+* check that the response had no error
+* check that the response had the status code "201"
+* check that Rule is in Rulelist
+
 ## upload Rule with unauthenticated certificate
 
 tags: negative_test
