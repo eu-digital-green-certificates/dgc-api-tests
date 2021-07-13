@@ -18,7 +18,7 @@ from os import path
 import requests
 from getgauge.python import data_store, step
 from requests import Response
-from step_impl.util import baseurl, certificateFolder
+from step_impl.util import baseurl, certificateFolder, jreurl
 
 
 @step("get all valuesets IDs")
@@ -53,3 +53,30 @@ def get_all_valuesets():
     valueSetIds = response.json()
     valueSets = [get_valueset_by_id(valuesetId) for valuesetId in valueSetIds]
     data_store.scenario["responses"] = valueSets
+
+@step("get RAT Valuesets from JRC database")
+def get_rat_valuesets_from_jrc_database():
+    response = requests.get(jreurl)
+    assert response.ok, "could not get Valueset from JRC database"
+    data_store.scenario["response"] = response
+    data_store.scenario["jre_valueset"] = response.json()
+
+@step("get RAT Valuesets from Gateway")
+def get_rat_valuesets_from_gateway():
+    response = get_valueset_by_id('covid-19-lab-test-manufacturer-and-name')
+    assert response.ok, "could not get Valueset from Gateway"
+    data_store.scenario["response"] = response
+    data_store.scenario["gateway_valueset"] = response.json()
+
+@step("check that RAT Valuesets from JRC database and Gateway match")
+def check_that_rat_valuesets_from_jrc_database_and_gateway_match():
+    jreValueset = data_store.scenario["jre_valueset"]
+    gatewayData = data_store.scenario["gateway_valueset"]
+    gatewayValuesets = gatewayData["valueSetValues"]
+    for device in jreValueset['deviceList']:
+        deviceId = device['id_device']
+        assert deviceId in gatewayValuesets.keys(
+        ), f"id {deviceId} not in gateway. Keys: {gatewayValuesets.keys()}"
+        gatewayValueset = gatewayValuesets[deviceId]
+        assert device["hsc_common_list"] == gatewayValueset['active'], f"expected valueset {deviceId} to be {'active' if device['hsc_common_list'] else 'inactive'} but it wasn't"
+

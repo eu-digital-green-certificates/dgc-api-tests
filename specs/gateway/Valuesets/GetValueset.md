@@ -36,3 +36,11 @@ Use an NBTLS to try to authenticate when downloading the Valuesets
 * get all valuesets with custom certificate
 * check that the response had an error
 * check that the response had the status code "401"
+
+## Check that RAT Valueset equal data of JRC Database
+
+The National Backend should update the RAT Valuesets from the JRC database.
+
+* get RAT Valuesets from JRC database
+* get RAT Valuesets from Gateway
+* check that RAT Valuesets from JRC database and Gateway match
