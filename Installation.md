@@ -42,8 +42,8 @@
 In this repository
 
 ```
-git clone https://github.com/corona-warn-app/cwa-pytest-apitest
-cd cwa-pytest-apitest
+git clone https://github.com/eu-digital-green-certificates/dgc-api-tests.git
+cd dgc-api-tests
 
 pipenv install
 
