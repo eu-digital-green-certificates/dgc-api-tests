@@ -25,7 +25,10 @@ from step_impl.util.certificates import get_own_country_name
 @step("create a valid <Ruletype> Rule")
 def create_a_valid_rule(ruletype):
     countryName = get_own_country_name()
-    ValidFrom = datetime.now() + timedelta(days=2, seconds=10)
+    if ruletype == "Invalidation":
+        ValidFrom = datetime.now() + timedelta(seconds=10)
+    else:
+        ValidFrom = datetime.now() + timedelta(days=2, seconds=10)
     ValidTo = ValidFrom + timedelta(days=5)
     RuleID = "GR" if ruletype=="Acceptance" else "IR"
     # rule mostly from examole in specification
