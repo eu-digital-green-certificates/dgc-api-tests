@@ -16,16 +16,15 @@
 
 from base64 import b64encode
 from os import path
+from random import choice
 
 import requests
+from cryptography import x509
 from cryptography.hazmat.primitives import serialization
+from cryptography.x509.oid import NameOID
 from getgauge.python import data_store, step
 from requests import Response
-
-from . import baseurl, certificateFolder
-from cryptography import x509
-from cryptography.x509.oid import NameOID
-from random import choice
+from step_impl.util import baseurl, certificateFolder
 
 
 @step("check that DSC is in trustlist")

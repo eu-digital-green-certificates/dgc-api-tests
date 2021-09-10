@@ -23,10 +23,11 @@ from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
-
-from . import baseurl, certificateFolder, authCerts
-from .certificates import create_cms, create_dsc, create_certificate
-from .dsc_deletion import delete_dsc
+from step_impl.gateway.dsc_deletion import delete_dsc
+from step_impl.util import authCerts, baseurl, certificateFolder
+from step_impl.util.certificates import (create_certificate,
+                                         create_cms_with_certificate,
+                                         create_dsc)
 
 
 def add_dsc_to_store(dsc: str):
@@ -36,6 +37,7 @@ def add_dsc_to_store(dsc: str):
         dscs = []
         data_store.spec["created_dscs"] = dscs
     dscs.append(dsc)
+
 
 @step("create a valid DSC")
 def create_valid_dsc():
@@ -67,7 +69,7 @@ def sign_dsc_with_upload_certificate():
     upload_key = serialization.load_pem_private_key(
         open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
 
-    data_store.scenario["signed_dsc"] = create_cms(
+    data_store.scenario["signed_dsc"] = create_cms_with_certificate(
         dsc_cert, upload_cert, upload_key)
 
 
@@ -79,7 +81,7 @@ def sign_dsc_with_upload_certificate_of_another_country():
     upload_key = serialization.load_pem_private_key(
         open(path.join(certificateFolder, "secondCountry", "key_upload.pem"), "rb").read(), None)
 
-    data_store.scenario["signed_dsc"] = create_cms(
+    data_store.scenario["signed_dsc"] = create_cms_with_certificate(
         dsc_cert, upload_cert, upload_key)
 
 
@@ -101,6 +103,16 @@ def create_custom_authentication_certificate():
     (cert, key) = create_certificate()
     data_store.scenario["auth_cert"] = cert
     data_store.scenario["auth_key"] = key
+    cert_location = path.join(certificateFolder, "custom_auth.pem")
+    key_location = path.join(certificateFolder, "custom_key_auth.pem")
+    with open(cert_location, "wb") as f:
+        f.write(cert.public_bytes(serialization.Encoding.PEM))
+    with open(key_location, "wb") as f:
+        f.write(key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ))
 
 
 @step("upload unsigned DSC")
@@ -117,23 +129,14 @@ def upload_unsigned_dsc():
 @step("upload DSC with custom client certificate")
 def upload_dsc_with_custom_client_certificate():
     signedDsc = data_store.scenario["signed_dsc"]
-    authCert = data_store.scenario["auth_cert"]
-    authKey = data_store.scenario["auth_key"]
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    with open(cert_location, "wb") as f:
-        f.write(authCert.public_bytes(serialization.Encoding.PEM))
-    with open(key_location, "wb") as f:
-        f.write(authKey.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        ))
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64"}
     response = requests.post(url=baseurl + "/signerCertificate",
                              data=signedDsc, headers=headers, cert=(cert_location, key_location))
     data_store.scenario["response"] = response
+
 
 @step("delete all created certificates")
 def delete_all_created_certificates():

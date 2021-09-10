@@ -1,6 +1,3 @@
-from os import path
-from random import choice
-
 # ---license-start
 # eu-digital-green-certificates / dgc-api-tests
 # ---
@@ -16,13 +13,14 @@ from random import choice
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ---license-end
+from os import path
+from random import choice
 
 import requests
+from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
-
-from . import authCerts, baseurl, certificateFolder
-from cryptography.hazmat.primitives import serialization
+from step_impl.util import authCerts, baseurl, certificateFolder
 
 
 def delete_dsc(signedDsc: str, authCerts: (str, str)):
@@ -37,6 +35,16 @@ def delete_dsc(signedDsc: str, authCerts: (str, str)):
 def delete_dsc_created():
     signedDsc = data_store.scenario["signed_dsc"]
     response = delete_dsc(signedDsc, authCerts)
+    data_store.scenario["response"] = response
+
+
+@step("delete DSC created using alias Endpoint")
+def delete_dsc_created_using_alias_endpoint():
+    signedDsc = data_store.scenario["signed_dsc"]
+    headers = {"Content-Type": "application/cms",
+               "Content-Transfer-Encoding": "base64"}
+    response = requests.post(
+        url=baseurl + "/signerCertificate/delete", data=signedDsc, headers=headers, cert=authCerts)
     data_store.scenario["response"] = response
 
 

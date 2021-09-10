@@ -16,6 +16,7 @@
 
 from base64 import b64encode
 from datetime import datetime, timedelta
+from os import path
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -24,13 +25,27 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.serialization import pkcs7
 from cryptography.x509 import Certificate
 from cryptography.x509.oid import NameOID
+from step_impl.util import certificateFolder
 
+
+def get_country_name_from_certificate(cert: Certificate) -> str:
+    return cert.subject.get_attributes_for_oid(NameOID.COUNTRY_NAME)[0].value
+
+def get_own_country_name() -> str:
+    csca_cert = x509.load_pem_x509_certificate(
+        open(path.join(certificateFolder, "csca.pem"), "rb").read())
+    return get_country_name_from_certificate(csca_cert)
 
 def create_certificate(signing_cert: Certificate = None, signing_key: Certificate = None):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
+    if signing_cert != None:
+        countryName = get_country_name_from_certificate(signing_cert)
+    else:
+        countryName = u"DE"
+
     subject = x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, u"DE"),
+        x509.NameAttribute(NameOID.COUNTRY_NAME, countryName),
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME,
                            u"Nothrhine Westphalia"),
         x509.NameAttribute(NameOID.LOCALITY_NAME, u"Essen"),
@@ -51,12 +66,15 @@ def create_dsc(csca_cert: Certificate, csca_key: RSAPrivateKey):
     return cert
 
 
-def create_cms(dsc_cert: Certificate, upload_cert: Certificate, upload_key: RSAPrivateKey):
+def create_cms_with_certificate(dsc_cert: Certificate, upload_cert: Certificate, upload_key: RSAPrivateKey):
+    return create_cms(dsc_cert.public_bytes(serialization.Encoding.DER), upload_cert, upload_key)
+
+
+def create_cms(data: bytes, upload_cert: Certificate, upload_key: RSAPrivateKey):
 
     options = [pkcs7.PKCS7Options.Binary]
 
-    builder = pkcs7.PKCS7SignatureBuilder().set_data(
-        dsc_cert.public_bytes(serialization.Encoding.DER))
+    builder = pkcs7.PKCS7SignatureBuilder().set_data(data)
     signed = builder.add_signer(upload_cert, upload_key, hash_algorithm=hashes.SHA256()).sign(
         encoding=serialization.Encoding.DER, options=options)
 

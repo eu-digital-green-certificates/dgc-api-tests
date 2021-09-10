@@ -13,3 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ---license-end
+import json
+from datetime import datetime
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.replace(microsecond=0).astimezone().isoformat()
+
+        return super().default(self, o)
