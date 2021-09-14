@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
 from step_impl.util import authCerts, baseurl, certificateFolder
-
+from requests.exceptions import SSLError
 
 def delete_dsc(signedDsc: str, authCerts: (str, str)):
     headers = {"Content-Type": "application/cms",
@@ -30,6 +30,11 @@ def delete_dsc(signedDsc: str, authCerts: (str, str)):
         url=baseurl + "/signerCertificate", data=signedDsc, headers=headers, cert=authCerts)
     return response
 
+
+class FailedResponse:
+    ok = False
+    status_code = None
+    text = None
 
 @step("delete DSC created")
 def delete_dsc_created():
@@ -71,5 +76,9 @@ def revoke_random_dsc_of_trustlist_with_unauthorized_authentication_certificate(
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption(),
         ))
-    response = delete_dsc(dscToDelete, (cert_location, key_location))
+    try:
+        response = delete_dsc(dscToDelete, (cert_location, key_location))
+    except SSLError:
+        response = FailedResponse()
+
     data_store.scenario["response"] = response

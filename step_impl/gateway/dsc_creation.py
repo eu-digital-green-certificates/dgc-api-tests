@@ -25,6 +25,7 @@ from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
 from step_impl.gateway.dsc_deletion import delete_dsc
 from step_impl.util import authCerts, baseurl, certificateFolder
+from requests.exceptions import SSLError
 from step_impl.util.certificates import (create_certificate,
                                          create_cms_with_certificate,
                                          create_dsc)
@@ -38,6 +39,10 @@ def add_dsc_to_store(dsc: str):
         data_store.spec["created_dscs"] = dscs
     dscs.append(dsc)
 
+class FailedResponse:
+    ok = False
+    status_code = None
+    text = None
 
 @step("create a valid DSC")
 def create_valid_dsc():
@@ -133,8 +138,12 @@ def upload_dsc_with_custom_client_certificate():
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64"}
-    response = requests.post(url=baseurl + "/signerCertificate",
+    try:
+        response = requests.post(url=baseurl + "/signerCertificate",
                              data=signedDsc, headers=headers, cert=(cert_location, key_location))
+    except SSLError:
+        response = FailedResponse()
+
     data_store.scenario["response"] = response
 
 

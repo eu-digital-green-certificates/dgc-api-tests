@@ -45,7 +45,6 @@ Delete a DSC of a country with an unauthorized client certificate.
 * create custom authentication certificate
 * delete random DSC with custom client certificate
 * check that the response had an error
-* check that the response had the status code "401"
 
 ## delete a DSC with client certificate of another country
 
