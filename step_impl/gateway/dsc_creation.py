@@ -24,7 +24,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
 from step_impl.gateway.dsc_deletion import delete_dsc
-from step_impl.util import authCerts, baseurl, certificateFolder
+from step_impl.util import authCerts, baseurl, certificateFolder, FailedResponse
 from requests.exceptions import SSLError
 from step_impl.util.certificates import (create_certificate,
                                          create_cms_with_certificate,
@@ -38,11 +38,6 @@ def add_dsc_to_store(dsc: str):
         dscs = []
         data_store.spec["created_dscs"] = dscs
     dscs.append(dsc)
-
-class FailedResponse:
-    ok = False
-    status_code = None
-    text = None
 
 @step("create a valid DSC")
 def create_valid_dsc():

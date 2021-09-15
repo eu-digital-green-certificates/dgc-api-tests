@@ -22,3 +22,8 @@ certificateFolder = join(getcwd(), environ.get("certificatesFolder"))
 authCerts = (
     path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem"))
 jreurl = environ.get('jreurl')
+
+class FailedResponse:
+    ok = False
+    status_code = None
+    text = None

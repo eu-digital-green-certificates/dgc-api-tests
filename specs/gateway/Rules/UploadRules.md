@@ -39,7 +39,7 @@ Upload a Rule with an unauthenticated certificate. There should be an error and 
 * create custom authentication certificate
 * upload Rule with custom authentication certificate
 * check that the response had an error
-* check that the response had the status code "401"
+* check that the response had the status code "401" or None
 * check that Rule is not in Rulelist
 
 ## upload Rule with authentication certificate of another country

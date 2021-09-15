@@ -35,7 +35,7 @@ Use an NBTLS to try to authenticate when downloading the Valuesets
 * create custom authentication certificate
 * get all valuesets with custom certificate
 * check that the response had an error
-* check that the response had the status code "401"
+* check that the response had the status code "401" or None
 
 ## Check that RAT Valueset equal data of JRC Database
 

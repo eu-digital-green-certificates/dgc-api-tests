@@ -19,6 +19,12 @@ import requests
 from getgauge.python import data_store, step
 from requests import Response
 from step_impl.util import baseurl, certificateFolder, jreurl
+from requests.exceptions import SSLError
+
+class FailedResponse:
+    ok = False
+    status_code = None
+    text = None
 
 
 @step("get all valuesets IDs")
@@ -32,8 +38,12 @@ def get_all_valuesets():
 def get_all_valuesets_with_custom_certificate():
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    response = requests.get(baseurl + f"/valuesets", cert=(
-        cert_location, key_location))
+
+    try:
+        response = requests.get(baseurl + f"/valuesets", cert=(
+            cert_location, key_location))
+    except SSLError:
+        response = FailedResponse()
     data_store.scenario["response"] = response
 
 def get_valueset_by_id(valuesetId):

@@ -20,7 +20,7 @@ import requests
 from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from requests import Response
-from step_impl.util import authCerts, baseurl, certificateFolder
+from step_impl.util import authCerts, baseurl, certificateFolder, FailedResponse
 from requests.exceptions import SSLError
 
 def delete_dsc(signedDsc: str, authCerts: (str, str)):
@@ -30,11 +30,6 @@ def delete_dsc(signedDsc: str, authCerts: (str, str)):
         url=baseurl + "/signerCertificate", data=signedDsc, headers=headers, cert=authCerts)
     return response
 
-
-class FailedResponse:
-    ok = False
-    status_code = None
-    text = None
 
 @step("delete DSC created")
 def delete_dsc_created():

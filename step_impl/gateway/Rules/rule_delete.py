@@ -24,9 +24,10 @@ from requests import Response
 from cryptography.x509 import Certificate
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
-from step_impl.util import baseurl, certificateFolder
+from step_impl.util import baseurl, certificateFolder, FailedResponse
 from step_impl.util.rules import delete_rule_by_id
 from step_impl.util.certificates import create_cms, get_own_country_name
+from requests.exceptions import SSLError
 
 
 
@@ -34,6 +35,7 @@ from step_impl.util.certificates import create_cms, get_own_country_name
 def delete_rule_by_id_for_teststeps(ruleId: str, upload_cert: Certificate, upload_key: RSAPrivateKey, tls_cert_location: str, tls_key_location: str) -> Response:
     response = delete_rule_by_id(ruleId, upload_cert, upload_key, tls_cert_location, tls_key_location)
     data_store.scenario["response"] = response
+
 
 @step("delete Rule")
 def delete_rule():
@@ -91,8 +93,13 @@ def delete_rule_created_with_custom_client_certificate():
         open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    delete_rule_by_id_for_teststeps(
-        ruleId, upload_cert, upload_key, cert_location, key_location)
+    try:
+        delete_rule_by_id_for_teststeps(
+            ruleId, upload_cert, upload_key, cert_location, key_location)
+    except SSLError:
+        data_store.scenario["response"] = FailedResponse()
+
+
 
 @step("delete Rule not in rulelist")
 def delete_rule_not_in_rulelist():

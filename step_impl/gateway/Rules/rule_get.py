@@ -21,7 +21,8 @@ from cryptography import x509
 from cryptography.x509.oid import NameOID
 from getgauge.python import data_store, step
 from requests import Response
-from step_impl.util import baseurl, certificateFolder
+from requests.exceptions import SSLError
+from step_impl.util import baseurl, certificateFolder, FailedResponse
 from step_impl.util.certificates import get_own_country_name
 from step_impl.util.rules import (download_rule_of_country,
                                   get_rules_from_rulelist)
@@ -38,10 +39,12 @@ def get_all_onboarded_countries():
 def get_all_onboarded_countries_with_custom_certificate():
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    response = requests.get(url=baseurl + "/countrylist",
-                            cert=(cert_location, key_location))
-    data_store.scenario["response"] = response
-
+    try:
+        response = requests.get(url=baseurl + "/countrylist",
+                                cert=(cert_location, key_location))
+        data_store.scenario["response"] = response
+    except SSLError:
+        data_store.scenario["response"] = FailedResponse()
 
 @step("check that own country is in onboared countries list")
 def check_that_own_country_is_in_onboared_countries_list():
@@ -67,11 +70,18 @@ def download_rules_of_all_countries():
 
 @step("download rules of all countries with custom certificate")
 def download_rules_of_all_countries_with_custom_certificate():
+    def do_requests(*args, **kwargs):
+        try:
+            response = requests.get( *args, **kwargs )
+        except SSLError:
+            response = FailedResponse()
+        return response
+
     response: Response = data_store.scenario["response"]
     countries = response.json()
     cert_location = path.join(certificateFolder, "custom_auth.pem")
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
-    responses = [requests.get(url=baseurl + f"/rules/{country}", cert=(
+    responses = [ do_requests(url=baseurl + f"/rules/{country}", cert=(
         cert_location, key_location)) for country in countries]
     data_store.scenario["responses"] = responses
 

@@ -25,7 +25,8 @@ from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.x509.oid import NameOID
 from getgauge.python import data_store, step
-from step_impl.util import baseurl, certificateFolder
+from requests.exceptions import SSLError
+from step_impl.util import baseurl, certificateFolder, FailedResponse
 from step_impl.util.certificates import create_cms
 from step_impl.util.json import DateTimeEncoder
 from step_impl.util.rules import (delete_rule_by_id_with_base_data,
@@ -88,8 +89,12 @@ def upload_rule_with_custom_authentication_certificate():
     key_location = path.join(certificateFolder, "custom_key_auth.pem")
     headers = {"Content-Type": "application/cms-text",
                "Content-Transfer-Encoding": "base64"}
-    response = requests.post(url=baseurl + "/rules",
+    try:
+        response = requests.post(url=baseurl + "/rules",
                              data=data, headers=headers, cert=(cert_location, key_location))
+    except SSLError:
+        response = FailedResponse()
+
     data_store.scenario["response"] = response
 
 

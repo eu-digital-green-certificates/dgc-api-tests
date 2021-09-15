@@ -37,6 +37,14 @@ def check_that_the_response_had_the_status_code(expected):
     assert status_code == int(
         expected), f"response status code was {status_code} but expected {expected}"
 
+@step("check that the response had the status code <int> or None")
+def check_that_the_response_had_the_status_code(expected):
+    response = data_store.scenario["response"]
+    status_code = response.status_code
+    assert status_code is None or status_code == int(
+        expected), f"response status code was {status_code} but expected {expected} or None"
+
+
 
 @step("check that the response is not empty")
 def check_that_the_response_is_not_empty():
@@ -63,6 +71,13 @@ def check_that_all_responses_had_the_status_code(expected):
     responses: List[Response] = data_store.scenario["responses"]
     for response in responses:
         assert int(expected) == response.status_code, f"response code should be {expected} but it was {response.status_code}"
+
+
+@step("check that all responses had the status code <200> or None")
+def check_that_all_responses_had_the_status_code(expected):
+    responses: List[Response] = data_store.scenario["responses"]
+    for response in responses:
+        assert response.status_code is None or int(expected) == response.status_code
 
 
 @step("check that all responses are not empty")

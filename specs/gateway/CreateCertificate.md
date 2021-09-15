@@ -27,6 +27,7 @@ Upload a DSC of a country with an unauthorized client certificate. The response 
 * create custom authentication certificate
 * upload DSC with custom client certificate
 * check that the response had an error
+* check that the response had the status code "401" or None
 
 ## upload DSC with mismatched certificate
 
