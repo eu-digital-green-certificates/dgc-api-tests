@@ -25,7 +25,7 @@ tags: negative_test
 Test that the Gateway responds with an error message if the ValidTo Value is less than 120h in the future
 
 * create a valid Acceptance Rule
-* change ValidTo to "-71"h before the current ValidTo
+* change ValidTo to "71"h after the current ValidFrom
 * upload Rule
 * check that the response had an error
 * check that the response had the status code "400"

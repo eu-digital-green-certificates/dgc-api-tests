@@ -128,6 +128,14 @@ def change_validto_to_1h_before_the_current_validto(hoursStr):
     change_rule(change_valid_to)
 
 
+@step("change ValidTo to <1>h after the current ValidFrom")
+def change_validto_to_1h_before_the_current_validto(hoursStr):
+    hours = int(hoursStr)
+    def change_valid_to(rule):
+        rule["ValidTo"] = rule["ValidFrom"] + timedelta(hours=hours)
+    change_rule(change_valid_to)
+
+
 def change_version_to(version):
     def change_version(rule):
         rule["Version"] = version
