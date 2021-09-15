@@ -16,5 +16,19 @@ Test that the Gateway responds with an error message if the ValidFrom Value is n
 * check that the response had an error
 * check that the response had the status code "400"
 
+
+## Value of ValidTo must more than 72h future from now
+
+tags: negative_test
+
+Test that the Gateway responds with an error message if the ValidTo Value is less than 72h in the future
+
+* create a valid Invalidation Rule
+* change ValidTo to "-71"h before the current ValidTo
+* upload Rule
+* check that the response had an error
+* check that the response had the status code "400"
+
+
 ___
 * delete all created rules

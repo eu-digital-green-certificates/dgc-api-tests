@@ -17,6 +17,20 @@ Upload a Acceptance Rule which is valid ealier than 48h. There should be an erro
 * check that the response had the status code "400"
 * check that Rule is not in Rulelist
 
+
+## Value of ValidTo must more than 120h future from now
+
+tags: negative_test
+
+Test that the Gateway responds with an error message if the ValidTo Value is less than 120h in the future
+
+* create a valid Acceptance Rule
+* change ValidTo to "-71"h before the current ValidTo
+* upload Rule
+* check that the response had an error
+* check that the response had the status code "400"
+
+
 ## upload Rule with CertificateType not matching RuleId
 
 tags: negative_test
