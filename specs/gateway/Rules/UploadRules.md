@@ -53,5 +53,18 @@ Upload a Rule with a NBTLS certificate of another country. There should be an er
 * check that the response had an error
 * check that Rule is not in Rulelist
 
+## upload rule with trailing database
+
+tags: negative_test
+
+Upload a Rule with trailing data after the main payload. The API should reject the rule. 
+
+* create a valid <Ruletype> Rule
+* upload Rule with extra data
+* check that the response had an error
+* check that the response had the status code "400" or None
+* check that Rule is not in Rulelist
+
+
 ___
 * delete all created rules

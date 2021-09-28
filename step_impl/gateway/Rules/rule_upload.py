@@ -42,19 +42,26 @@ def add_rule_to_store(rule):
     rules.append(rule)
 
 
-def get_signed_rule():
+def get_signed_rule(append_extra_data=False):
     rule = data_store.scenario["rule"]
+    
     ruleJson = json.dumps(rule, cls=DateTimeEncoder)
+    if append_extra_data:
+        ruleJson = ruleJson + ruleJson
+
     upload_cert = x509.load_pem_x509_certificate(
         open(path.join(certificateFolder, "upload.pem"), "rb").read())
     upload_key = serialization.load_pem_private_key(
         open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
     return create_cms(ruleJson.encode("utf-8"), upload_cert, upload_key)
 
+@step("upload Rule with extra data")
+def upload_rule_with_extra_data():
+    return upload_rule(append_extra_data=True)
 
 @step("upload Rule")
-def upload_rule():
-    data = get_signed_rule()
+def upload_rule(append_extra_data=False):
+    data = get_signed_rule(append_extra_data)
     cert_location = path.join(certificateFolder, "auth.pem")
     key_location = path.join(certificateFolder, "key_auth.pem")
     headers = {"Content-Type": "application/cms-text",
