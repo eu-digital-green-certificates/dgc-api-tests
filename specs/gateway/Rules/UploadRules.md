@@ -53,7 +53,7 @@ Upload a Rule with a NBTLS certificate of another country. There should be an er
 * check that the response had an error
 * check that Rule is not in Rulelist
 
-## upload rule with trailing database
+## upload rule with trailing characters
 
 tags: negative_test
 
