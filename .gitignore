@@ -11,3 +11,6 @@ reports
 *.pyc
 
 certificates/**/*.pem
+certificates/**/*.crt
+certificates/**/*.key
+
