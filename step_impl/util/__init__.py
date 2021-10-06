@@ -18,6 +18,7 @@ from os import environ, getcwd, path
 from os.path import join
 
 baseurl = environ.get('baseurl')
+validationServiceUrl = environ.get('validationServiceUrl')
 certificateFolder = join(getcwd(), environ.get("certificatesFolder"))
 authCerts = (
     path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem"))
