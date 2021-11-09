@@ -19,6 +19,7 @@ from os.path import join
 
 baseurl = environ.get('baseurl')
 validationServiceUrl = environ.get('validationServiceUrl')
+bookingPortalUrl = environ.get('bookingPortalUrl')
 certificateFolder = join(getcwd(), environ.get("certificatesFolder"))
 authCerts = (
     path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem"))

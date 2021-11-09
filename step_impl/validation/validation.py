@@ -14,8 +14,10 @@
 # limitations under the License.
 # ---license-end
 
+import base64
 import requests
 import ecdsa
+import json
 import jwt
 from ecdsa.curves import NIST256p
 from os import path
@@ -23,7 +25,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from getgauge.python import data_store, step
 from datetime import datetime
-from step_impl.util import validationServiceUrl
+from step_impl.util import validationServiceUrl, bookingPortalUrl
 from step_impl.util.signing import sign_and_encode_dcc
 
 from hashlib import sha256
@@ -32,12 +34,28 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto.Util.Padding import pad, unpad
+from ecdsa.util import sigencode_der
+from random import randbytes
+
+
 from step_impl.util.signing import sign_and_encode_dcc
-from  step_impl.util.signing import get_ec_key_from_private_key
-from  step_impl.util.signing import get_rsa_key_from_private_key
+from step_impl.util.signing import get_ec_key_from_private_key
+from step_impl.util.signing import get_rsa_key_from_private_key
 
 _DECORATOR_KEY_FILE = 'key_decorator.pem'
+_DECORATOR_KEY_KID_FILE = 'key_decorator.kid'
+_VALIDATOR_CERT_FILE = 'validator.pem'
+_VALIDATOR_KID = 'validator.kid'
 _CERTIFICATES_FOLDER = 'certificates'
+
+_DEFAULT_GIVENNAME = 'Vorname'
+_DEFAULT_FAMILYNAME = 'Nachname'
+_DEFAULT_DOB = '1990-01-01'
 
 @step("The validation service must be available")
 def the_validation_service_must_be_available():
@@ -47,11 +65,11 @@ def the_validation_service_must_be_available():
 
 @step("Create a vaccination payload")
 def create_vaccination_payload():
-    payload = {-260: {1: {'dob': '1990-01-01',
-            'nam': {'fn': 'Nachname',
-                    'fnt': 'NACHNAME',
-                    'gn': 'Vorname',
-                    'gnt': 'VORNAME'},
+    payload = {-260: {1: {'dob': _DEFAULT_DOB,
+            'nam': {'fn': _DEFAULT_FAMILYNAME,
+                    'fnt': _DEFAULT_FAMILYNAME.upper(),
+                    'gn': _DEFAULT_GIVENNAME,
+                    'gnt': _DEFAULT_GIVENNAME.upper()},
             'v': [{'ci': 'URN:UVCI:V1:DE:8IUW3BRPRGIKP1C3C8EHGGEBNY',
                    'co': 'DE',
                    'dn': 1,
@@ -63,7 +81,7 @@ def create_vaccination_payload():
                    'tg': '840539006',
                    'vp': '1119305005'}],
             'ver': '1.3.0'}},
-        1: 'DX',
+        1: 'DE',
         6: 1609455600,
         4: 1672441200}
 
@@ -98,14 +116,18 @@ def sign_with_dsc(country_code):
         key = get_ec_key_from_private_key(dscKey)
         algorithm = Es256
     data_store.scenario["dcc_signed"] = sign_and_encode_dcc(data_store.scenario["dcc_payload"], key, algorithm, kid )
-    print(data_store.scenario["dcc_signed"])
+    #print(data_store.scenario["dcc_signed"])
 
 @step("Start a new checkin procedure")
 def new_checkin_procedure():
     sc = data_store.scenario
     sc["subject"] = str(uuid4())
     sc["userkey"] = ecdsa.SigningKey.generate(curve=NIST256p,hashfunc=sha256)
+
     sc["decoratorkey"] = open(path.join(_CERTIFICATES_FOLDER,_DECORATOR_KEY_FILE)).read()
+    sc["decoratorkey:kid"] = open(path.join(_CERTIFICATES_FOLDER,_DECORATOR_KEY_KID_FILE)).read().strip()
+    #print(sc['decoratorkey:kid'])
+
     for keyType in ['initialize','status']:
         sc[f"{keyType}key"] =  jwt.encode({
                                   "sub": sc['subject'],
@@ -113,44 +135,106 @@ def new_checkin_procedure():
                                   "iat":0,
                                   "aud": f"{validationServiceUrl}/{keyType}/{sc['subject']}"
                                   },
-                                  sc["decoratorkey"], algorithm="ES256")
+                                  sc["decoratorkey"], algorithm="ES256", headers={"kid":sc["decoratorkey:kid"]})
 
     # Initialize the checkin
     body = {    "keyType":"ES256",
                 "pubKey": sc["userkey"].get_verifying_key().to_pem().decode(), 
-                "nonce": str(uuid4())}
-    headers = {"Authorization":"Bearer "+sc['initializekey'], "X-Version":"1.0"}                
-    response = requests.put( f"{validationServiceUrl}/initialize/{sc['subject']}", json=body, headers=headers )
-    print(response.status_code, response.text)
+                "nonce": base64.b64encode(bytes(16)).decode() } 
+    headers = {"content-type": "application/json","Authorization":"Bearer "+sc['initializekey'], "X-Version":"1.0"}    
+    #print(body, headers)            
+    response = requests.put( f"{validationServiceUrl}/initialize/{sc['subject']}", data=json.dumps(body), headers=headers )
+    #print(response.status_code, response.text, response.headers)
     assert response.ok
 
+    # Filling the validation context with defaults, so only test case specific data needs to be overwritten
+    sc['validationContext'] = {
+                "lang":"en",
+                "fnt":_DEFAULT_FAMILYNAME.upper(),
+                "gnt":_DEFAULT_GIVENNAME.upper(),
+                "dob":_DEFAULT_DOB,
+                "validationClock": datetime.now().isoformat(),
+                "validFrom": datetime.now().isoformat(),
+                "validTo": (datetime.now() + timedelta(days=2)).isoformat(),
+                "type":["v","r"] # 2G-Regel
+                }
 
-@step("Set departure country <DX>")
-def set_departure_country(DX):
-    pass
+@step("Set departure country <COD>")
+def set_departure_country(COD):
+    data_store.scenario['validationContext']['coa'] = COD
 
-@step("Set arrival country <DE>")
-def set_arrival_country(DE):
-    pass
+@step("Set arrival country <COA>")
+def set_arrival_country(COA):
+    data_store.scenario['validationContext']['coa'] = COA
 
-@step("Set departure date <2021-12-01>")
-def set_departure_date(arg1):
-    pass
+@step("Set departure date <dateISO>")
+def set_departure_date(dateISO):
+    recoded_date = datetime.fromisoformat(dateISO).isoformat()+"+01:00"
+    data_store.scenario['validationContext']['validFrom'] = recoded_date
+    data_store.scenario['validationContext']['validationClock'] = recoded_date
 
-@step("Set arrival date <2021-12-01>")
-def set_arrival_date(arg1):
-    pass
+@step("Set arrival date <dateISO>")
+def set_arrival_date(dateISO):
+    recoded_date = datetime.fromisoformat(dateISO).isoformat()+"+01:00"
+    data_store.scenario['validationContext']['validTo'] = recoded_date
 
 @step("Validate DCC")
 def validate_dcc():
-    pass
+    sc = data_store.scenario
+
+    password = randbytes(32)
+    key = RSA.import_key(open(path.join(_CERTIFICATES_FOLDER,_VALIDATOR_CERT_FILE)).read())
+        
+    cipher = PKCS1_OAEP.new(key,hashAlgo=SHA256)
+    cryptKey = cipher.encrypt(password)
+    aesCipher = AES.new(password, AES.MODE_CBC,iv=bytes(16))
+    ciphertext= aesCipher.encrypt(pad(bytes(sc["dcc_signed"],'utf-8'),AES.block_size))
+    signature = sc["userkey"].sign(ciphertext,hashfunc=SHA256.new,sigencode=sigencode_der)
+
+    validator_kid = open(path.join(_CERTIFICATES_FOLDER,_VALIDATOR_KID)).read().strip()
+
+
+    validateToken = jwt.encode({
+                                  "jti":str(uuid4()),
+                                  "sub":sc['subject'],
+                                  "exp":int(datetime(2030,12,31).timestamp()),
+                                  "aud": f"{validationServiceUrl}/validate/{sc['subject']}",
+                                  "t":1,
+                                  "v":"1.0",
+                                  "vc":sc['validationContext']
+                                  },
+                                  sc["decoratorkey"], algorithm="ES256",headers={"kid":sc["decoratorkey:kid"]})
+
+    headers = {'content-type': 'application/json', "Authorization":"Bearer " + validateToken,"X-Version":"1.0"}
+
+
+    body = {"kid":validator_kid,
+                "dcc":base64.b64encode(ciphertext).decode(),
+                "sig":base64.b64encode(signature).decode(),
+                "sigAlg":"EC",
+                "encKey":base64.b64encode(cryptKey).decode(),
+                "encScheme":"RSAOAEPWithSHA256AESCBC",
+                "sigAlg":"SHA256withECDSA"}
+
+    response = requests.post( f"{validationServiceUrl}/validate/{sc['subject']}", data=json.dumps(body), headers=headers )
+    if not response.ok:
+        print(response.status_code, response.text)
+    assert response.ok
+    #print(f'Validate result: {response.status_code}')
+
+    headers = {"Authorization":"Bearer "+sc['statuskey'],"X-Version":"1.0"}
+    response = requests.get(f"{validationServiceUrl}/status/{sc['subject']}", headers=headers )
+    assert response.ok
+    sc['validation:status'] = jwt.decode(response.content, options={"verify_signature":False})
+
+
 
 @step("Check that the result is valid")
 def check_that_the_result_is_valid():
-    pass
+    assert data_store.scenario['validation:status']['result'] == 'OK'
 
 @step("Check that the result is invalid")
 def check_that_the_result_is_invalid():
-    pass
+    assert data_store.scenario['validation:status']['result'] == 'NOK'
 
 
