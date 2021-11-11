@@ -25,7 +25,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from getgauge.python import data_store, step
 from datetime import datetime
-from step_impl.util import validationServiceUrl, bookingPortalUrl
+from step_impl.util import validationServiceUrl, callbackServer
 from step_impl.util.signing import sign_and_encode_dcc
 
 from hashlib import sha256
@@ -40,8 +40,8 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto.Util.Padding import pad, unpad
 from ecdsa.util import sigencode_der
-from random import randbytes
-
+from random import randbytes, choice
+from string import digits, ascii_uppercase
 
 from step_impl.util.signing import sign_and_encode_dcc
 from step_impl.util.signing import get_ec_key_from_private_key
@@ -53,14 +53,46 @@ _VALIDATOR_CERT_FILE = 'validator.pem'
 _VALIDATOR_KID = 'validator.kid'
 _CERTIFICATES_FOLDER = 'certificates'
 
+
+# Defaults 
+
 _DEFAULT_GIVENNAME = 'Vorname'
 _DEFAULT_FAMILYNAME = 'Nachname'
 _DEFAULT_DOB = '1990-01-01'
+_DEFAULT_VACCINE = 'EU/1/20/1528'
+_DEFAULT_VAC_MANUFACTURER = 'ORG-100030215'
+_DEFAULT_COUNTRY = 'DE'
+
+
 
 @step("The validation service must be available")
 def the_validation_service_must_be_available():
     services = requests.get( validationServiceUrl ).json()
     assert "verificationMethod" in services
+
+def _random_uvci():
+    random_part = ''.join( choice(ascii_uppercase + digits) for x in range(26) )
+    return f'URN:UVCI:V1:{_DEFAULT_COUNTRY}:{random_part}'
+
+@step("Create a recovery payload")
+def create_a_recovery_payload():
+    payload = {-260: {1: {'dob': _DEFAULT_DOB,
+            'nam': {'fn': _DEFAULT_FAMILYNAME,
+                    'fnt': _DEFAULT_FAMILYNAME.upper(),
+                    'gn': _DEFAULT_GIVENNAME,
+                    'gnt': _DEFAULT_GIVENNAME.upper()},
+            'r': [{'ci': _random_uvci(),
+                   'co': _DEFAULT_COUNTRY,
+                   'df': '2021-10-01',
+                   'du': '2022-11-01',
+                   'fr': '2021-11-01',
+                   'is': 'Testarzt T-Systems',
+                   'tg': '840539006'}],
+            'ver': '1.3.0'}},
+        1: 'DE',
+        6: 1600000000,
+        4: 1700000000}
+    data_store.scenario["dcc_payload"] = payload
 
 
 @step("Create a vaccination payload")
@@ -70,22 +102,27 @@ def create_vaccination_payload():
                     'fnt': _DEFAULT_FAMILYNAME.upper(),
                     'gn': _DEFAULT_GIVENNAME,
                     'gnt': _DEFAULT_GIVENNAME.upper()},
-            'v': [{'ci': 'URN:UVCI:V1:DE:8IUW3BRPRGIKP1C3C8EHGGEBNY',
-                   'co': 'DE',
-                   'dn': 1,
+            'v': [{'ci': _random_uvci(),
+                   'co': _DEFAULT_COUNTRY,
+                   'dn': 2,
                    'dt': '2021-08-01',
                    'is': 'Impfzentrum T-Systems',
-                   'ma': 'ORG-100001699',
-                   'mp': 'EU/1/21/1529',
+                   'ma': _DEFAULT_VAC_MANUFACTURER,
+                   'mp': _DEFAULT_VACCINE,
                    'sd': 2,
                    'tg': '840539006',
                    'vp': '1119305005'}],
             'ver': '1.3.0'}},
         1: 'DE',
-        6: 1609455600,
-        4: 1672441200}
-
+        6: 1600000000,
+        4: 1700000000}
     data_store.scenario["dcc_payload"] = payload
+
+
+@step("Set rDCC field <fieldname> to <value>")
+def set_vdcc_field( fieldname, value ):
+    data_store.scenario["dcc_payload"][-260][1]['r'][0][fieldname] = value
+
 
 @step("Set vDCC field <fieldname> to <value>")
 def set_vdcc_field( fieldname, value ):
@@ -118,8 +155,12 @@ def sign_with_dsc(country_code):
     data_store.scenario["dcc_signed"] = sign_and_encode_dcc(data_store.scenario["dcc_payload"], key, algorithm, kid )
     #print(data_store.scenario["dcc_signed"])
 
+@step("Start a new checkin procedure with callback")
+def new_checkin_procedure_with_cb():
+    return new_checkin_procedure(callback=True)
+
 @step("Start a new checkin procedure")
-def new_checkin_procedure():
+def new_checkin_procedure(callback=False):
     sc = data_store.scenario
     sc["subject"] = str(uuid4())
     sc["userkey"] = ecdsa.SigningKey.generate(curve=NIST256p,hashfunc=sha256)
@@ -141,6 +182,8 @@ def new_checkin_procedure():
     body = {    "keyType":"ES256",
                 "pubKey": sc["userkey"].get_verifying_key().to_pem().decode(), 
                 "nonce": base64.b64encode(bytes(16)).decode() } 
+    if callback:
+        body['callback'] = f"{callbackServer}/{sc['subject']}"
     headers = {"content-type": "application/json","Authorization":"Bearer "+sc['initializekey'], "X-Version":"1.0"}    
     #print(body, headers)            
     response = requests.put( f"{validationServiceUrl}/initialize/{sc['subject']}", data=json.dumps(body), headers=headers )
@@ -169,9 +212,8 @@ def set_arrival_country(COA):
 
 @step("Set departure date <dateISO>")
 def set_departure_date(dateISO):
-    recoded_date = datetime.fromisoformat(dateISO).isoformat()+"+01:00"
-    data_store.scenario['validationContext']['validFrom'] = recoded_date
-    data_store.scenario['validationContext']['validationClock'] = recoded_date
+    data_store.scenario['validationContext']['validFrom'] = datetime.fromisoformat(dateISO).isoformat()+"+01:00"
+    data_store.scenario['validationContext']['validationClock'] = (datetime.fromisoformat(dateISO)+timedelta(hours=8)).isoformat()+"+01:00"
 
 @step("Set arrival date <dateISO>")
 def set_arrival_date(dateISO):
@@ -226,7 +268,7 @@ def validate_dcc():
     response = requests.get(f"{validationServiceUrl}/status/{sc['subject']}", headers=headers )
     assert response.ok
     sc['validation:status'] = jwt.decode(response.content, options={"verify_signature":False})
-
+    print("\n",sc['validation:status']['result'],sc['validation:status']['results'])
 
 
 @step("Check that the result is valid")
@@ -237,4 +279,10 @@ def check_that_the_result_is_valid():
 def check_that_the_result_is_invalid():
     assert data_store.scenario['validation:status']['result'] == 'NOK'
 
-
+@step("Check that callback result is identical to polling result")
+def check_that_callback_result_is_identical_to_polling_result():
+    sc = data_store.scenario
+    response = requests.get(url=f"{callbackServer}/{sc['subject']}")
+    assert response.ok
+    callback_status = jwt.decode(response.content, options={"verify_signature":False})
+    assert callback_status == sc['validation:status']

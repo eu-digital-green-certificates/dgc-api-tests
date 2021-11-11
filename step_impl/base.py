@@ -8,4 +8,4 @@ def wait_for_seconds(seconds):
 @step("Reference <test_id>")
 def reference(test_id):
     # This can be used to implement references to a test management DB
-    pass
+    print(f"\n  *references {test_id}\n")
