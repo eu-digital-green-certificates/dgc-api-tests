@@ -199,16 +199,19 @@ def new_checkin_procedure(callback=False):
                 "validationClock": datetime.now().isoformat(),
                 "validFrom": datetime.now().isoformat(),
                 "validTo": (datetime.now() + timedelta(days=2)).isoformat(),
-                "type":["v","r"] # 2G-Regel
+                "type":["v","r"], # 2G-Regel
+                "category" : ["Standard"]
                 }
 
 @step("Set departure country <COD>")
 def set_departure_country(COD):
-    data_store.scenario['validationContext']['coa'] = COD
+    data_store.scenario['validationContext']['cod'] = COD
+    data_store.scenario['validationContext']['rod'] = COD
 
 @step("Set arrival country <COA>")
 def set_arrival_country(COA):
     data_store.scenario['validationContext']['coa'] = COA
+    data_store.scenario['validationContext']['roa'] = COA
 
 @step("Set departure date <dateISO>")
 def set_departure_date(dateISO):
@@ -235,13 +238,14 @@ def validate_dcc():
 
     validator_kid = open(path.join(_CERTIFICATES_FOLDER,_VALIDATOR_KID)).read().strip()
 
+    #print(json.dumps(sc['validationContext'], indent=4))
 
     validateToken = jwt.encode({
                                   "jti":str(uuid4()),
                                   "sub":sc['subject'],
                                   "exp":int(datetime(2030,12,31).timestamp()),
                                   "aud": f"{validationServiceUrl}/validate/{sc['subject']}",
-                                  "t":1,
+                                  "t": 2,
                                   "v":"1.0",
                                   "vc":sc['validationContext']
                                   },
@@ -277,7 +281,7 @@ def check_that_the_result_is_valid():
 
 @step("Check that the result is invalid")
 def check_that_the_result_is_invalid():
-    assert data_store.scenario['validation:status']['result'] == 'NOK'
+    assert data_store.scenario['validation:status']['result'] in ('NOK','CHK')
 
 @step("Check that callback result is identical to polling result")
 def check_that_callback_result_is_identical_to_polling_result():

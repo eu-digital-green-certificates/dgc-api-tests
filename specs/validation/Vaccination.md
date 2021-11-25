@@ -133,3 +133,34 @@ Validation of vaccination DCCs.
 * Set arrival date "2022-03-01"
 * Validate DCC
 * Check that the result is invalid
+
+## Non-Covid vaccination is rejected
+* Reference "TXR-4216"
+* Start a new checkin procedure with callback
+* Create a vaccination payload
+* Set vDCC field "dt" to "2021-11-01" 
+* Set vDCC field "tg" to "123456" 
+* Set vDCC dose "2" of "2"
+* Add claim keys valid from "2021-11-01" until "2022-11-01"
+* Sign with DSC of "DX"
+* Set departure country "DE"
+* Set arrival country "DE"
+* Set departure date "2021-12-01"
+* Set arrival date "2021-12-01"
+* Validate DCC
+* Check that the result is invalid
+
+## Vaccination is rejected for untrusted DSC
+* Reference "TXR-4214"
+* Start a new checkin procedure with callback
+* Create a vaccination payload
+* Set vDCC field "dt" to "2021-11-01" 
+* Set vDCC dose "2" of "2"
+* Add claim keys valid from "2021-11-01" until "2022-11-01"
+* Sign with DSC of "ZZ"
+* Set departure country "DE"
+* Set arrival country "DE"
+* Set departure date "2021-12-01"
+* Set arrival date "2021-12-01"
+* Validate DCC
+* Check that the result is invalid
