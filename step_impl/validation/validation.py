@@ -49,10 +49,7 @@ from step_impl.util.signing import get_rsa_key_from_private_key
 
 _DECORATOR_KEY_FILE = 'key_decorator.pem'
 _DECORATOR_KEY_KID_FILE = 'key_decorator.kid'
-_VALIDATOR_CERT_FILE = 'validator.pem'
-_VALIDATOR_KID = 'validator.kid'
 _CERTIFICATES_FOLDER = 'certificates'
-
 
 # Defaults 
 
@@ -69,6 +66,17 @@ _DEFAULT_COUNTRY = 'DE'
 def the_validation_service_must_be_available():
     services = requests.get( validationServiceUrl ).json()
     assert "verificationMethod" in services
+
+    # Get the validation service encryption key and save it in the session
+    # It will be used to encrypt the symmetric key which encrypts the DCC before transmission to the service
+    for method in services["verificationMethod"]:
+        if method["id"].endswith("ValidationServiceEncKey-1"):
+            data_store.scenario["validatorkey"] = method["publicKeyJwk"]["x5c"]
+            data_store.scenario["validatorkey:obj"] = RSA.import_key(f'-----BEGIN CERTIFICATE-----\n{method["publicKeyJwk"]["x5c"]}\n-----END CERTIFICATE-----')
+            data_store.scenario["validatorkey:kid"] = method["publicKeyJwk"]["kid"]
+            break
+    
+    assert "validatorkey" in data_store.scenario
 
 def _random_uvci():
     random_part = ''.join( choice(ascii_uppercase + digits) for x in range(26) )
@@ -228,17 +236,12 @@ def validate_dcc():
     sc = data_store.scenario
 
     password = randbytes(32)
-    key = RSA.import_key(open(path.join(_CERTIFICATES_FOLDER,_VALIDATOR_CERT_FILE)).read())
-        
-    cipher = PKCS1_OAEP.new(key,hashAlgo=SHA256)
+            
+    cipher = PKCS1_OAEP.new(sc['validatorkey:obj'],hashAlgo=SHA256)
     cryptKey = cipher.encrypt(password)
     aesCipher = AES.new(password, AES.MODE_CBC,iv=bytes(16))
     ciphertext= aesCipher.encrypt(pad(bytes(sc["dcc_signed"],'utf-8'),AES.block_size))
     signature = sc["userkey"].sign(ciphertext,hashfunc=SHA256.new,sigencode=sigencode_der)
-
-    validator_kid = open(path.join(_CERTIFICATES_FOLDER,_VALIDATOR_KID)).read().strip()
-
-    #print(json.dumps(sc['validationContext'], indent=4))
 
     validateToken = jwt.encode({
                                   "jti":str(uuid4()),
@@ -254,7 +257,7 @@ def validate_dcc():
     headers = {'content-type': 'application/json', "Authorization":"Bearer " + validateToken,"X-Version":"1.0"}
 
 
-    body = {"kid":validator_kid,
+    body = {"kid":sc['validatorkey:kid'],
                 "dcc":base64.b64encode(ciphertext).decode(),
                 "sig":base64.b64encode(signature).decode(),
                 "sigAlg":"EC",
