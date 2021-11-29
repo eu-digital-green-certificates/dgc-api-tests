@@ -271,6 +271,9 @@ def validate_dcc():
     assert response.ok
     #print(f'Validate result: {response.status_code}')
 
+    sc['validation:validation_response'] = jwt.decode(response.content, options={"verify_signature": False})
+    print("\n", sc['validation:validation_response']["result"], sc['validation:validation_response']["results"])
+
     headers = {"Authorization":"Bearer "+sc['statuskey'],"X-Version":"1.0"}
     response = requests.get(f"{validationServiceUrl}/status/{sc['subject']}", headers=headers )
     assert response.ok
@@ -293,3 +296,12 @@ def check_that_callback_result_is_identical_to_polling_result():
     assert response.ok
     callback_status = jwt.decode(response.content, options={"verify_signature":False})
     assert callback_status == sc['validation:status']
+
+@step("Check that the polling/callback result doesn't contain sensitive data")
+def check_that_results_are_empty_for_polling():
+    assert not data_store.scenario['validation:status']['results']
+
+@step("Check that the validate result contains infos or is ok")
+def check_that_the_validate_result_contains_infos_or_is_ok():
+    sc = data_store.scenario['validation:validation_response']
+    assert sc['result'] == 'OK' or sc['results']

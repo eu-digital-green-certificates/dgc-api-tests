@@ -22,6 +22,8 @@ Validation of recovery DCCs.
 * Validate DCC
 * Check that the result is valid
 * Check that callback result is identical to polling result
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Recovery DCC with du before DoA is rejected
 * Reference "TXR-4218"
@@ -39,6 +41,8 @@ Validation of recovery DCCs.
 * Validate DCC
 * Check that the result is invalid
 * Check that callback result is identical to polling result
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 
 ## Recovery DCC with df after DoD is rejected
@@ -57,6 +61,8 @@ Validation of recovery DCCs.
 * Validate DCC
 * Check that the result is invalid
 * Check that callback result is identical to polling result
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Non-Covid-Recovery is rejected
 * Reference "TXR-4217"
@@ -75,3 +81,5 @@ Validation of recovery DCCs.
 * Validate DCC
 * Check that the result is invalid
 * Check that callback result is identical to polling result
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
