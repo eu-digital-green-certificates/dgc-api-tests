@@ -20,6 +20,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-01"
 * Validate DCC
 * Check that the result is valid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 
 ## Vaccination 2/2 from 3 days ago is invalid
@@ -36,6 +38,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-03"
 * Validate DCC
 * Check that the result is invalid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 
 ## Expired vaccination DCC is invalid
@@ -50,7 +54,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-11-02"
 * Validate DCC
 * Check that the result is invalid
-
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination DCC signed with expired DSC is invalid
 * Reference "TXR-4203"
@@ -64,9 +69,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2024-11-02"
 * Validate DCC
 * Check that the result is invalid
-
-
-
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination 1/2 is invalid
 * Reference "TXR-4201"
@@ -84,7 +88,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-01"
 * Validate DCC
 * Check that the result is invalid
-
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination with unknown vaccine is invalid
 * Reference "TXR-4204"
@@ -102,6 +107,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-01"
 * Validate DCC
 * Check that the result is invalid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination is rejected for issuance date in future
 * Reference "TXR-4213"
@@ -117,7 +124,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2022-03-01"
 * Validate DCC
 * Check that the result is invalid
-
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination is rejected for vaccination date in future
 * Reference "TXR-4212"
@@ -133,6 +141,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2022-03-01"
 * Validate DCC
 * Check that the result is invalid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Non-Covid vaccination is rejected
 * Reference "TXR-4216"
@@ -149,6 +159,8 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-01"
 * Validate DCC
 * Check that the result is invalid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
 
 ## Vaccination is rejected for untrusted DSC
 * Reference "TXR-4214"
@@ -164,3 +176,5 @@ Validation of vaccination DCCs.
 * Set arrival date "2021-12-01"
 * Validate DCC
 * Check that the result is invalid
+* Check that the polling/callback result doesn't contain sensitive data
+* Check that the validate result contains infos or is ok
