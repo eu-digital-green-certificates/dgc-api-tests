@@ -10,7 +10,11 @@ reports
 # Gauge - python compiled files
 *.pyc
 
+# Certificates
 certificates/**/*.pem
-certificates/**/*.crt
 certificates/**/*.key
+certificates/**/*.crt 
 
+# Data files
+*.json
+*.zip
