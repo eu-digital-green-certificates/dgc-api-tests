@@ -71,6 +71,7 @@ def get_the_trustlist_with_the_type(type):
     response = requests.get(baseurl + f"/trustList/{type}", cert=(
         path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
     data_store.scenario["response"] = response
+    data_store.scenario[f"trustlist.{type}"] = response.json()
 
 
 @step("check that only entries of the type <type> are present")
