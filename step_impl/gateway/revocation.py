@@ -39,11 +39,17 @@ REVOCATION_LIST_PATH = '/revocation-list'
 
 @step("create a revocation list of type <hashtype> with <num_entries> entries")
 def create_a_revocation_list_of_type_with_entries(hashtype, num_entries):
-    revocation_list = [b64encode(sha256(randbytes(64)).digest()).decode('utf-8') for n in range(int(num_entries))]
+    batch_id = str(uuid.uuid4())
+    entries = [b64encode(sha256(randbytes(64)).digest()).decode('utf-8') for n in range(int(num_entries))]
+    revocation_list = {
+        'country' : 'DE', # TODO
+        'expires' : (datetime.now()+timedelta(days=2)).isoformat(timespec='hours') + ':00:00Z',
+        'kid' : '1234567=', # TODO
+        'hashType' : hashtype, 
+        'entries' : entries
+    }
     data_store.scenario["revocation.list"] = json.dumps(revocation_list)  
-    #add_temp_file(name='crl.json', contents=json.dumps(revocation_list))
-    #add_temp_file(name='encrypted.cms', contents='')
-    #data_store.scenario["revocation.commandline"] = 'openssl cms -in crl.json -encrypt -out encrypted.cms'.split()
+    data_store.scenario["revocation.batch_id"] = batch_id
 
 
 @step("sign revocation list as first country")
@@ -94,10 +100,9 @@ def upload_revocation_list(cert):
     if not "rev.lists.created" in data_store.spec:
         data_store.spec["rev.lists.created"] = []
 
-    batch_id = str(uuid.uuid4())
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64",
-               "ETag" : batch_id,
+               "ETag" : data_store.scenario["revocation.list.batch_id"],
                }
     response = requests.post(f"{baseurl}{REVOCATION_LIST_PATH}", data=data_store.scenario["revocation.list.signed"], headers=headers, cert=cert)
     data_store.scenario["response"] = response
@@ -106,7 +111,7 @@ def upload_revocation_list(cert):
     if response.ok:
         data_store.spec["rev.lists.created"].append( {
             'used_tls_cert' : cert, 
-            'batch_id' : batch_id
+            'batch_id' : data_store.scenario["revocation.list.batch_id"],
         } )
 
 
