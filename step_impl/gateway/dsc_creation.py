@@ -24,7 +24,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.x509 import Certificate
 from getgauge.python import data_store, step
 from step_impl.gateway.dsc_deletion import delete_dsc
-from step_impl.util import authCerts, baseurl, certificateFolder, FailedResponse
+from step_impl.util import authCerts, baseurl, certificateFolder, FailedResponse, secondCountryFolder
 from requests.exceptions import SSLError
 from step_impl.util.certificates import (create_certificate,
                                          create_cms_with_certificate,
@@ -53,9 +53,9 @@ def create_valid_dsc():
 @step("create a DSC for another country")
 def create_a_dsc_for_another_country():
     csca_cert = x509.load_pem_x509_certificate(
-        open(path.join(certificateFolder, "secondCountry", "csca.pem"), "rb").read())
+        open(path.join(certificateFolder, secondCountryFolder, "csca.pem"), "rb").read())
     csca_key = serialization.load_pem_private_key(
-        open(path.join(certificateFolder, "secondCountry", "key_csca.pem"), "rb").read(), None)
+        open(path.join(certificateFolder, secondCountryFolder, "key_csca.pem"), "rb").read(), None)
 
     cert = create_dsc(csca_cert, csca_key)
     data_store.scenario["dsc"] = cert
@@ -77,9 +77,9 @@ def sign_dsc_with_upload_certificate():
 def sign_dsc_with_upload_certificate_of_another_country():
     dsc_cert = data_store.scenario["dsc"]
     upload_cert = x509.load_pem_x509_certificate(
-        open(path.join(certificateFolder, "secondCountry", "upload.pem"), "rb").read())
+        open(path.join(certificateFolder, secondCountryFolder, "upload.pem"), "rb").read())
     upload_key = serialization.load_pem_private_key(
-        open(path.join(certificateFolder, "secondCountry", "key_upload.pem"), "rb").read(), None)
+        open(path.join(certificateFolder, secondCountryFolder, "key_upload.pem"), "rb").read(), None)
 
     data_store.scenario["signed_dsc"] = create_cms_with_certificate(
         dsc_cert, upload_cert, upload_key)

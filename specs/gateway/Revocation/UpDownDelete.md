@@ -6,22 +6,37 @@ tags: DGC_GW, Revocation
 
 Test cases for the upload and download of revocation lists 
 
-| timeframe | 
-|-----------|
-|         0 |
-|         1 |
-|         7 | 
+| days_ago | 
+|----------|
+|        1 |
+|        7 | 
 
-## Download revocation list from <timeframe> days ago
 
-* download revocatin list from <timeframe> days ago
+## Download revocation list from <days_ago> days ago
+
+* use default certificates
+* download revocation list from <days_ago> days ago
+* check that the response had no error
+
+## Cannot download revocation list from future
+
+* use default certificates
+* download revocation list from "0" days ago
+* check that the response had the status code "400" or None
+
 
 ## First country uploads, second country downloads
 
-* create a revocation list of type "UVCI" with "500" entries
-* sign revocation list as first country
-* upload revocation list as first country
-* download revocation list from second country
+* use default certificates
+* create a revocation list of type "SIGNATURE" with "500" entries
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* use 2nd country for authentication
+* download revocation list from "1" days ago
+* check that the response had no error
 
-___
+
+____________________
+
 * delete all uploaded revocation lists

@@ -22,6 +22,7 @@ validationServiceUrl = environ.get('validationServiceUrl')
 bookingPortalUrl = environ.get('bookingPortalUrl')
 certificateFolder = join(getcwd(), environ.get("certificatesFolder"))
 callbackServer = environ.get('callbackServer')
+secondCountryFolder = environ.get('secondCountryFolder')
 authCerts = (
     path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem"))
 jreurl = environ.get('jreurl')
