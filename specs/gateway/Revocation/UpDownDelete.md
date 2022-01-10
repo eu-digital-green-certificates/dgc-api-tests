@@ -27,6 +27,7 @@ Test cases for the upload and download of revocation lists
 
 ## First country uploads, second country downloads
 
+* Reference "TXR-4898"
 * use default certificates
 * create a revocation list of type "SIGNATURE" with "500" entries
 * sign revocation list
@@ -63,6 +64,3 @@ Test cases for the upload and download of revocation lists
 * upload revocation list
 * check that the response had an error
 
-____________________
-
-* delete all uploaded revocation lists
