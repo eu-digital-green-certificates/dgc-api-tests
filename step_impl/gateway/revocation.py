@@ -24,7 +24,7 @@ from hashlib import sha256
 from random import randbytes
 
 from os import path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from asn1crypto import cms
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
@@ -79,15 +79,22 @@ def get_revocation_list(if_modified_since='2021-06-01T00:00:00Z'):
         headers={'If-Modified-Since': if_modified_since},
         cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
     data_store.scenario["response"] = response
-    print("Response: ", response.status_code,  response.text)
+    #print("Response: ", response.status_code,  response.text)
     #data_store.scenario["revocation-list.batches"] = response.json()['batches']
+
+@step("check that only results from <days> days ago are in the response")
+def check_that_only_results_from_days_ago_are_in_the_response(days):
+    pivot_date = datetime.now(timezone.utc) - timedelta(days=int(days))
+    for batch in data_store.scenario["response"].json()["batches"]:
+        batch_date = datetime.fromisoformat(batch["date"])
+        assert batch_date >= pivot_date
 
 @step("download batch with id <batchId>")
 def get_revocation_list_batch(batchId):
     response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{batchId}", 
         cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
     data_store.scenario["response"] = response
-    print("Response: ", response.status_code,  response.text)
+    #print("Response: ", response.status_code,  response.text)
 
 
 @step("upload revocation list")
@@ -103,9 +110,10 @@ def upload_revocation_list():
                #"ETag" : data_store.scenario["revocation.list.batch_id"],
                }
     response = requests.post(f"{baseurl}{REVOCATION_LIST_PATH}", data=data_store.scenario["revocation.list.signed"], headers=headers, cert=cert)
-    print(response.headers)
+    #print(response.headers)
     data_store.scenario["response"] = response
-    print("Response: ", response.status_code,  response.text)
+    #print("Response: ", response.status_code,  response.text)
+    
     # for cleanup later
     if response.ok:
         data_store.spec["rev.lists.created"].append( {
@@ -113,7 +121,7 @@ def upload_revocation_list():
             'certs.upload.key' : data_store.scenario['certs.upload.key'],
             'certs.auth.crt' : data_store.scenario['certs.auth.crt'],
             'certs.auth.key' : data_store.scenario['certs.auth.key'],
-            'batch_id' : "6b865013-9c2a-4ff8-ae5c-f2faee7ef905" # response.headers['ETag'],
+            'batch_id' : "6b865013-9c2a-4ff8-ae5c-f2faee7ef905" # response.headers['ETag'], # TODO: Get Batch ID from upload 
         } )
 
 @step("delete all uploaded revocation lists")

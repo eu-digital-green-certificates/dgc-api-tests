@@ -16,6 +16,7 @@ Test cases for the upload and download of revocation lists
 
 * use default certificates
 * download revocation list from <days_ago> days ago
+* check that only results from <days_ago> days ago are in the response
 * check that the response had no error
 
 ## Cannot download revocation list from future
@@ -23,7 +24,6 @@ Test cases for the upload and download of revocation lists
 * use default certificates
 * download revocation list from "0" days ago
 * check that the response had the status code "400" or None
-
 
 ## First country uploads, second country downloads
 
@@ -35,6 +35,7 @@ Test cases for the upload and download of revocation lists
 * use 2nd country for authentication
 * download revocation list from "1" days ago
 * check that the response had no error
+
 
 
 ____________________
