@@ -36,7 +36,32 @@ Test cases for the upload and download of revocation lists
 * download revocation list from "1" days ago
 * check that the response had no error
 
+## Upload with more than 10000 entries is blocked
 
+* use default certificates
+* create a revocation list of type "SIGNATURE" with "10001" entries
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+
+## Upload with auth certificate from different country is blocked
+
+* use default certificates
+* create a revocation list of type "SIGNATURE" with "500" entries
+* use 2nd country for authentication
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+## Upload of list signed by different country is blocked
+
+* use default certificates
+* create a revocation list of type "SIGNATURE" with "500" entries
+* use 2nd country for upload signature
+* sign revocation list
+* upload revocation list
+* check that the response had an error
 
 ____________________
 
