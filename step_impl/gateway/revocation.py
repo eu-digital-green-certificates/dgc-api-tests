@@ -37,11 +37,17 @@ from step_impl.util.certificates import create_cms
 
 REVOCATION_LIST_PATH = '/revocation-list'
 
+@step("create a revocation list of type <hashtype> with <num_entries> entries in short format")
+def create_a_revocation_list_short(hashtype, num_entries):
+    return create_a_revocation_list_of_type_with_entries(hashtype, num_entries, short_format=True)
+
 @step("create a revocation list of type <hashtype> with <num_entries> entries")
-def create_a_revocation_list_of_type_with_entries(hashtype, num_entries):
-    #batch_id = str(uuid.uuid4())
-    #entries = [b64encode(randbytes(16)).decode('utf-8') for n in range(int(num_entries))]
-    entries = [ {'hash':b64encode(randbytes(16)).decode('utf-8')} for n in range(int(num_entries))]
+def create_a_revocation_list_of_type_with_entries(hashtype, num_entries, short_format=False):
+    if short_format:
+        entries = [b64encode(randbytes(16)).decode('utf-8') for n in range(int(num_entries))]
+    else:
+        entries = [ {'hash':b64encode(randbytes(16)).decode('utf-8')} for n in range(int(num_entries))]
+
     revocation_list = {
         'country' : 'DX', 
         'expires' : (datetime.now()+timedelta(days=2)).isoformat(timespec='hours') + ':00:00Z',
@@ -50,7 +56,6 @@ def create_a_revocation_list_of_type_with_entries(hashtype, num_entries):
         'entries' : entries
     }
     data_store.scenario["revocation.list"] = json.dumps(revocation_list)  
-    #data_store.scenario["revocation.list.batch_id"] = batch_id
 
 
 @step("sign revocation list")
@@ -107,7 +112,6 @@ def upload_revocation_list():
 
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64",
-               #"ETag" : data_store.scenario["revocation.list.batch_id"],
                }
     response = requests.post(f"{baseurl}{REVOCATION_LIST_PATH}", data=data_store.scenario["revocation.list.signed"], headers=headers, cert=cert)
     #print(response.headers)
@@ -116,12 +120,13 @@ def upload_revocation_list():
     
     # for cleanup later
     if response.ok:
+        data_store.scenario["revocation.list.batch_id"] = response.headers['ETag']
         data_store.spec["rev.lists.created"].append( {
             'certs.upload.crt' : data_store.scenario['certs.upload.crt'],
             'certs.upload.key' : data_store.scenario['certs.upload.key'],
             'certs.auth.crt' : data_store.scenario['certs.auth.crt'],
             'certs.auth.key' : data_store.scenario['certs.auth.key'],
-            'batch_id' : "6b865013-9c2a-4ff8-ae5c-f2faee7ef905" # response.headers['ETag'], # TODO: Get Batch ID from upload 
+            'batch_id' : response.headers['ETag'], 
         } )
 
 @step("delete all uploaded revocation lists")
