@@ -35,3 +35,8 @@ def select_second_country_upload():
 def select_second_country_tls():
     data_store.scenario['certs.auth.crt'] = path.join(certificateFolder, secondCountryFolder, "auth.pem")
     data_store.scenario['certs.auth.key'] = path.join(certificateFolder, secondCountryFolder, "key_auth.pem")
+
+@step("use unauthorized country for authentication")
+def select_second_country_tls():
+    data_store.scenario['certs.auth.crt'] = path.join(certificateFolder, "custom_auth.pem")
+    data_store.scenario['certs.auth.key'] = path.join(certificateFolder, "custom_key_auth.pem")    
