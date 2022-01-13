@@ -6,61 +6,137 @@ tags: DGC_GW, Revocation
 
 Test cases for the upload and download of revocation lists 
 
+
 | days_ago | 
 |----------|
 |        1 |
-|        7 | 
-
-
+|        7 |
 ## Download revocation list from <days_ago> days ago
-
+* Reference "TXR-4896"
 * use default certificates
 * download revocation list from <days_ago> days ago
+* check that the response had no error
 * check that only results from <days_ago> days ago are in the response
 * check that the response had no error
 
-## Cannot download revocation list from future
 
+## Revocation list download forbidden
+* Reference "TXR-4897"
+* create custom authentication certificate
+* use unauthorized country for authentication
+* download revocation list from "1" days ago
+* check that the response had an error
+
+
+## Cannot download revocation list from future
 * use default certificates
-* download revocation list from "0" days ago
+* download revocation list from "-1" days ago
 * check that the response had the status code "400" or None
 
-## First country uploads, second country downloads
 
+## Revocation batch upload type SIGNATURE
 * Reference "TXR-4898"
 * use default certificates
-* create a revocation list of type "SIGNATURE" with "500" entries
+* create revocation list: type="SIGNATURE", entries="500", expiry="2"
 * sign revocation list
 * upload revocation list
 * check that the response had no error
-* use 2nd country for authentication
 * download revocation list from "1" days ago
 * check that the response had no error
-
-## Upload with more than 10000 entries is blocked
-
-* use default certificates
-* create a revocation list of type "SIGNATURE" with "10001" entries
-* sign revocation list
-* upload revocation list
-* check that the response had an error
+* batch can be found
 
 
-## Upload with auth certificate from different country is blocked
-
-* use default certificates
-* create a revocation list of type "SIGNATURE" with "500" entries
+## Revocation batch upload fails bc wrong country
+* Reference "TXR-4900"
 * use 2nd country for authentication
-* sign revocation list
-* upload revocation list
-* check that the response had an error
-
-## Upload of list signed by different country is blocked
-
-* use default certificates
-* create a revocation list of type "SIGNATURE" with "500" entries
 * use 2nd country for upload signature
+* create revocation list: type="SIGNATURE", entries="500", expiry="2"
 * sign revocation list
 * upload revocation list
 * check that the response had an error
 
+
+## Revocation batch upload fails bc wrong country using first country
+* Reference "TXR-4900"
+* use default certificates
+* create a revocation list of type "SIGNATURE" with "500" entries for country "DE"
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+
+## Revocation batch upload fails bc expired
+* Reference "TXR-4901"
+* use default certificates
+* create revocation list: type="SIGNATURE", entries="500", expiry="-2"
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+
+## Revocation batch upload fails bc list too big
+* Reference "TXR-4902"
+* use default certificates
+* create revocation list: type="SIGNATURE", entries="1001", expiry="2"
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+
+## Revocation batch upload fails bc schema invalid
+* Reference "TXR-4903"
+* use default certificates
+* create revocation list: type="INVALID TYPE", entries="500", expiry="2"
+* sign revocation list
+* upload revocation list
+* check that the response had an error
+
+
+## Revocation batch delete
+* Reference "TXR-4904"
+* use default certificates
+* create revocation list: type="SIGNATURE", entries="500", expiry="2"
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* delete all uploaded revocation lists
+* check that deletion responses are "" ok
+* download revocation list from "1" days ago
+*  check that the response had no error
+* check that deleted batches are "" deleted
+
+
+## Revocation batch delete alternative endpoint
+* Reference "TXR-4905"
+* use default certificates
+* create revocation list: type="SIGNATURE", entries="500", expiry="2"
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* delete all uploaded revocation lists using alternate endpoint
+* check that deletion responses are "" ok
+* download revocation list from "1" days ago
+* check that the response had no error
+* check that deleted batches are "" deleted
+
+
+## Revocation batch delete fails bc wrong country
+* Reference "TXR-4907"
+* use default certificates
+* create revocation list: type="SIGNATURE", entries="500", expiry="2"
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* use 2nd country for authentication
+* use 2nd country for upload signature
+* delete all uploaded revocation lists using current certificates
+* check that deletion responses are "not" ok
+* use default certificates
+* download revocation list from "1" days ago
+* check that the response had no error
+* check that deleted batches are "not" deleted
+
+
+____________________
+
+* delete all uploaded revocation lists
