@@ -98,10 +98,11 @@ def check_that_only_results_from_days_ago_are_in_the_response(days):
         assert batch_date >= pivot_date
 
 
-@step("download batch with id <batchId>")
-def get_revocation_list_batch(batch_id):
-    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{batch_id}",
+@step("download uploaded batch")
+def get_revocation_list_batch():
+    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{data_store.scenario['revocation.list.batch_id']}",
                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
+    # print(base64.b64decode(response.text))
     data_store.scenario["response"] = response
     return response
 
@@ -175,18 +176,28 @@ def delete_all_uploaded_revocation_lists(alternate_endpoint=False, use_upload_ce
         data_store.spec["rev.lists.created"] = []
 
 
-@step("check that deleted batches are <empty_if_positive> deleted")
-def check_that_deleted_batches_are_deleted(empty_if_positive=''):
+@step("check that deleted batches are not deleted")
+def check_that_deleted_batches_are_not_deleted():
+    check_that_deleted_batches_are_deleted(should_be_okay=False)
+
+
+@step("check that deleted batches are deleted")
+def check_that_deleted_batches_are_deleted(should_be_okay=True):
     batches = data_store.scenario["response"].json()["batches"]
     for batch_id in get_and_clear_list("rev.lists.deleted_ids"):
         batch = find_batch(batch_id=lambda: batch_id, batches=lambda: batches)
-        assert not empty_if_positive == batch['deleted'], f"Batch {batch_id} has not been deleted"
+        assert should_be_okay == batch['deleted'], f"Batch {batch_id} has not been deleted"
 
 
-@step("check that deletion responses are <empty_if_positive> ok")
-def check_deletion_responses(empty_if_positive=''):
+@step("check that deletion responses are not ok")
+def check_deletion_responses_are_not_ok():
+    check_deletion_responses(should_be_okay=False)
+
+
+@step("check that deletion responses are ok")
+def check_deletion_responses(should_be_okay=True):
     for resp in get_and_clear_list("rev.lists.deleted"):
-        assert not empty_if_positive == resp.ok, f'{resp.text} ok={resp.ok} expected ok={bool(empty_if_positive)}'
+        assert should_be_okay == resp.ok, f'{resp.text} ok={resp.ok} expected ok={should_be_okay}'
 
 
 @step("batch can be found")

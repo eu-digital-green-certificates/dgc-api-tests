@@ -100,10 +100,10 @@ Test cases for the upload and download of revocation lists
 * upload revocation list
 * check that the response had no error
 * delete all uploaded revocation lists
-* check that deletion responses are "" ok
+* check that deletion responses are ok
 * download revocation list from "1" days ago
-*  check that the response had no error
-* check that deleted batches are "" deleted
+* check that the response had no error
+* check that deleted batches are deleted
 
 
 ## Revocation batch delete alternative endpoint
@@ -114,10 +114,23 @@ Test cases for the upload and download of revocation lists
 * upload revocation list
 * check that the response had no error
 * delete all uploaded revocation lists using alternate endpoint
-* check that deletion responses are "" ok
+* check that deletion responses are ok
 * download revocation list from "1" days ago
 * check that the response had no error
-* check that deleted batches are "" deleted
+* check that deleted batches are deleted
+
+
+## Revocation batch download forbidden
+* Reference "TXR-4906"
+* use 2nd country for authentication
+* use 2nd country for upload signature
+* create a revocation list of type "SIGNATURE" with "500" entries for country "DE"
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* use default certificates
+* download uploaded batch
+* check that the response had an error
 
 
 ## Revocation batch delete fails bc wrong country
@@ -130,11 +143,11 @@ Test cases for the upload and download of revocation lists
 * use 2nd country for authentication
 * use 2nd country for upload signature
 * delete all uploaded revocation lists using current certificates
-* check that deletion responses are "not" ok
+* check that deletion responses are not ok
 * use default certificates
 * download revocation list from "1" days ago
 * check that the response had no error
-* check that deleted batches are "not" deleted
+* check that deleted batches are not deleted
 
 
 ____________________
