@@ -30,17 +30,17 @@ from step_impl.util.certificates import create_cms
 REVOCATION_LIST_PATH = '/revocation-list'
 
 
-@step("create a revocation list of type <hashtype> with <num_entries> entries in short format")
+@step("create a revocation batch of type <hashtype> with <num_entries> entries in short format")
 def create_a_revocation_list_short(hashtype, num_entries):
     return create_a_revocation_list_of_type_with_entries(hashtype, num_entries, short_format=True)
 
 
-@step("create a revocation list of type <hashtype> with <num_entries> entries for country <country>")
+@step("create a revocation batch of type <hashtype> with <num_entries> entries for country <country>")
 def create_a_revocation_list_short(hashtype, num_entries, country):
     return create_a_revocation_list_of_type_with_entries(hashtype, num_entries, country=country)
 
 
-@step("create revocation list: type=<hashtype>, entries=<num_entries>, expiry=<days>")
+@step("create revocation batch: type=<hashtype>, entries=<num_entries>, expiry=<days>")
 def create_a_revocation_list_of_type_with_entries(hashtype, num_entries, days=2, short_format=False, country='DX'):
     if short_format:
         entries = [b64encode(randbytes(16)).decode('utf-8') for _ in range(int(num_entries))]
@@ -58,7 +58,7 @@ def create_a_revocation_list_of_type_with_entries(hashtype, num_entries, days=2,
     data_store.scenario["revocation.list"] = json.dumps(revocation_list)
 
 
-@step("sign revocation list")
+@step("sign revocation batch")
 def sign_revocation_list_as_first_country():
     """Creates a CMS message from the revocation list using the upload cert"""
     upload_cert = x509.load_pem_x509_certificate(
@@ -107,7 +107,7 @@ def get_revocation_list_batch():
     return response
 
 
-@step("upload revocation list")
+@step("upload revocation batch")
 def upload_revocation_list():
     assert "revocation.list.signed" in data_store.scenario
 
@@ -132,17 +132,17 @@ def upload_revocation_list():
         })
 
 
-@step("delete all uploaded revocation lists using alternate endpoint")
+@step("delete uploaded revocation batches using alternate endpoint")
 def delete_all_uploaded_revocation_lists_using_alternate_endpoint():
     delete_all_uploaded_revocation_lists(alternate_endpoint=True)
 
 
-@step("delete all uploaded revocation lists using current certificates")
+@step("delete uploaded revocation batches using current certificates")
 def delete_all_uploaded_revocation_lists_using_current_certificates():
     delete_all_uploaded_revocation_lists(use_upload_certs=False)
 
 
-@step("delete all uploaded revocation lists")
+@step("delete uploaded revocation batches")
 def delete_all_uploaded_revocation_lists(alternate_endpoint=False, use_upload_certs=True):
     if "rev.lists.deleted" not in data_store.spec:
         data_store.scenario["rev.lists.deleted"] = []
@@ -178,15 +178,15 @@ def delete_all_uploaded_revocation_lists(alternate_endpoint=False, use_upload_ce
 
 @step("check that deleted batches are not deleted")
 def check_that_deleted_batches_are_not_deleted():
-    check_that_deleted_batches_are_deleted(should_be_okay=False)
+    check_that_deleted_batches_are_deleted(should_be_deleted=False)
 
 
 @step("check that deleted batches are deleted")
-def check_that_deleted_batches_are_deleted(should_be_okay=True):
+def check_that_deleted_batches_are_deleted(should_be_deleted=True):
     batches = data_store.scenario["response"].json()["batches"]
     for batch_id in get_and_clear_list("rev.lists.deleted_ids"):
         batch = find_batch(batch_id=lambda: batch_id, batches=lambda: batches)
-        assert should_be_okay == batch['deleted'], f"Batch {batch_id} has not been deleted"
+        assert should_be_deleted == batch['deleted'], f"Batch {batch_id} deletion status should be {should_be_deleted} but is {batch['deleted']}"
 
 
 @step("check that deletion responses are not ok")
