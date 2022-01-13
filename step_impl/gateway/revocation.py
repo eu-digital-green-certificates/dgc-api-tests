@@ -98,10 +98,11 @@ def check_that_only_results_from_days_ago_are_in_the_response(days):
         assert batch_date >= pivot_date
 
 
-@step("download batch with id <batchId>")
-def get_revocation_list_batch(batch_id):
-    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{batch_id}",
+@step("download uploaded batch")
+def get_revocation_list_batch():
+    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{data_store.scenario['revocation.list.batch_id']}",
                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
+    # print(base64.b64decode(response.text))
     data_store.scenario["response"] = response
     return response
 

@@ -120,6 +120,19 @@ Test cases for the upload and download of revocation lists
 * check that deleted batches are deleted
 
 
+## Revocation batch download forbidden
+* Reference "TXR-4906"
+* use 2nd country for authentication
+* use 2nd country for upload signature
+* create a revocation list of type "SIGNATURE" with "500" entries for country "DE"
+* sign revocation list
+* upload revocation list
+* check that the response had no error
+* use default certificates
+* download uploaded batch
+* check that the response had an error
+
+
 ## Revocation batch delete fails bc wrong country
 * Reference "TXR-4907"
 * use default certificates
