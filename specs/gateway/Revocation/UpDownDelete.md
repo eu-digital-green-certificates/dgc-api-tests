@@ -161,3 +161,6 @@ Test cases for the upload and download of revocation lists
 * download revocation list from "1" days ago
 * check that the response had no error
 * check that deleted batches are not deleted
+____
+
+* delete uploaded revocation batches
