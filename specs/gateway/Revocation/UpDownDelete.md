@@ -34,10 +34,34 @@ Test cases for the upload and download of revocation lists
 * check that the response had the status code "400" or None
 
 
-## Revocation batch upload type SIGNATURE
+## Revocation batch upload type SIGNATURE expiring in 2 days
 * Reference "TXR-4898"
 * use default certificates
 * create revocation batch: type="SIGNATURE", entries="500", expiry="2"
+* sign revocation batch
+* upload revocation batch
+* check that the response had no error
+* download revocation list from "1" days ago
+* check that the response had no error
+* batch can be found
+
+
+## Revocation batch upload type UCI expiring in 30 days
+* Reference "TXR-4898"
+* use default certificates
+* create revocation batch: type="UCI", entries="500", expiry="30"
+* sign revocation batch
+* upload revocation batch
+* check that the response had no error
+* download revocation list from "1" days ago
+* check that the response had no error
+* batch can be found
+
+
+## Revocation batch upload type COUNTRYCODEUCI expiring in 365 days
+* Reference "TXR-4898"
+* use default certificates
+* create revocation batch: type="COUNTRYCODEUCI", entries="500", expiry="365"
 * sign revocation batch
 * upload revocation batch
 * check that the response had no error
