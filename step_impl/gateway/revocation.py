@@ -49,7 +49,7 @@ def create_a_revocation_list_of_type_with_entries(hashtype, num_entries, days=2,
     revocation_list = {
         'country': country,
         'expires': (datetime.now() + timedelta(days=int(days))).isoformat(timespec='hours') + ':00:00Z',
-        'kid': '0NSBDWlaTng=',
+        'kid': b64encode(randbytes(8)).decode('utf-8'),
         'hashType': hashtype,
         'entries': entries
     }
