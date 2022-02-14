@@ -47,7 +47,7 @@ Test cases for the upload and download of revocation lists
 
 
 ## Revocation batch upload type UCI expiring in 30 days
-* Reference "TXR-4898"
+* Reference "TXR-6004"
 * use default certificates
 * create revocation batch: type="UCI", entries="500", expiry="30"
 * sign revocation batch
@@ -59,7 +59,7 @@ Test cases for the upload and download of revocation lists
 
 
 ## Revocation batch upload type COUNTRYCODEUCI expiring in 365 days
-* Reference "TXR-4898"
+* Reference "TXR-6005"
 * use default certificates
 * create revocation batch: type="COUNTRYCODEUCI", entries="500", expiry="365"
 * sign revocation batch
