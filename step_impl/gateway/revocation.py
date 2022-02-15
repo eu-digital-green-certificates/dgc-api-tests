@@ -214,3 +214,52 @@ def get_and_clear_list(name):
     result = data_store.scenario[name]
     data_store.scenario[name] = []
     return result
+
+
+@step("check that there are more batches")
+def check_that_there_are_more_batches():
+    assert data_store.scenario["response"].json()["more"], "There should be more batches on the gw for this Test-Case."
+
+
+@step("check that revocation list is full")
+def check_that_revocation_list_is_full():
+    assert len(data_store.scenario["response"].json()["batches"]) == 1000, "List should contain 1000 batches"
+
+
+@step("check that batches are sorted by ascending date")
+def check_that_batches_are_sorted_by_ascending_date():
+    last_date = None
+    for batch in data_store.scenario["response"].json()["batches"]:
+        batch_date = datetime.fromisoformat(batch["date"])
+        assert last_date is None or batch_date >= last_date
+        last_date = batch_date
+
+
+@step("download revocation list with If-Modified-Since after last list")
+def download_revocation_list_with_modified_since_after_last_list():
+    last_batch = data_store.scenario["response"].json()["batches"][-1]
+    data_store.scenario["last_batch"] = last_batch
+    batch_date = datetime.fromisoformat(last_batch['date'])
+    date_str = batch_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+    return get_revocation_list(if_modified_since=date_str)
+
+
+@step("check that revocation list is not empty")
+def check_that_revocation_list_is_not_empty():
+    assert data_store.scenario["response"].json()["batches"], "List should not be empty"
+
+
+@step("check that the last batch from the last revocation list is not in the new list")
+def check_that_last_batch_from_last_revocation_list_is_not_in_the_new_list():
+    for batch in data_store.scenario['response'].json()['batches']:
+        assert batch['batchId'] != data_store.scenario['last_batch']['batchId']
+
+
+@step("upload <batches> batches for country <country>")
+def upload_batches_for_country(batches, country='DX'):
+    for i in range(int(batches)):
+        create_a_revocation_list_of_type_with_entries("SIGNATURE", 1, days=2, country=country)
+        sign_revocation_list_as_first_country()
+        upload_revocation_list()
+        assert data_store.scenario["response"].ok, "Response should be ok"
+        print(f"Uploaded batch {i}: {data_store.scenario['revocation.list.batch_id']}")
