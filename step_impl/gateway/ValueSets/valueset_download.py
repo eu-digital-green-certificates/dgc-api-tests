@@ -47,8 +47,15 @@ def get_all_valuesets_with_custom_certificate():
     data_store.scenario["response"] = response
 
 def get_valueset_by_id(valuesetId):
-    return requests.get(baseurl + f"/valuesets/{valuesetId}", cert=(
+    response = requests.get(baseurl + f"/valuesets/{valuesetId}", cert=(
         path.join(certificateFolder, "auth.pem"), path.join(certificateFolder, "key_auth.pem")))
+
+    if response.ok:
+        outfile = open(f'{valuesetId}.json', 'wb')
+        outfile.write(response.content )
+        outfile.close()
+
+    return response 
 @step("get details of first Valueset in list")
 def get_details_of_first_valueset_in_list():
     response: Response = data_store.scenario["response"]
