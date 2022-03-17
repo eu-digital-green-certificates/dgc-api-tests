@@ -2,7 +2,8 @@
 
 tags: DGC_GW, Revocation
 
-* get the trustList with the type "UPLOAD"
+* use default certificates
+
 
 Test cases for the upload and download of revocation lists 
 
@@ -13,7 +14,6 @@ Test cases for the upload and download of revocation lists
 |        7 |
 ## Download revocation list from <days_ago> days ago
 * Reference "TXR-4896"
-* use default certificates
 * download revocation list from <days_ago> days ago
 * check that the response had no error
 * check that only results from <days_ago> days ago are in the response
@@ -29,14 +29,12 @@ Test cases for the upload and download of revocation lists
 
 
 ## Cannot download revocation list from future
-* use default certificates
 * download revocation list from "-1" days ago
 * check that the response had the status code "400" or None
 
 
 ## Revocation batch upload type SIGNATURE expiring in 2 days
 * Reference "TXR-4898"
-* use default certificates
 * create revocation batch: type="SIGNATURE", entries="500", expiry="2"
 * sign revocation batch
 * upload revocation batch
@@ -48,7 +46,6 @@ Test cases for the upload and download of revocation lists
 
 ## Revocation batch upload type UCI expiring in 30 days
 * Reference "TXR-6004"
-* use default certificates
 * create revocation batch: type="UCI", entries="500", expiry="30"
 * sign revocation batch
 * upload revocation batch
@@ -60,7 +57,6 @@ Test cases for the upload and download of revocation lists
 
 ## Revocation batch upload type COUNTRYCODEUCI expiring in 365 days
 * Reference "TXR-6005"
-* use default certificates
 * create revocation batch: type="COUNTRYCODEUCI", entries="500", expiry="365"
 * sign revocation batch
 * upload revocation batch
@@ -159,6 +155,7 @@ Test cases for the upload and download of revocation lists
 
 
 ## Revocation batch download forbidden for non EU
+* Skip: Cancelled
 * Reference "TXR-5580"
 * use 2nd country for authentication
 * use 2nd country for upload signature
