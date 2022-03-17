@@ -57,11 +57,33 @@ Feature: CMS update / migration
 
 ## Migrate a Revocation Batch
 * Reference "TXR-6346"
+* create revocation batch: type="SIGNATURE", entries="500", expiry="2"
+* sign revocation batch
+* upload revocation batch
+* check that the response had no error
+* get the list of migratables
+* check that the response had no error
+* check that the revocation batch is in the list of migratables
+* migrate revocation batch
+* check that the response had no error
+* get the list of migratables
+* check that the response had no error
+* check that the revocation batch is in the list of migratables
+* check that the batch's new CMS differs from the old one
 
 ## Attempt switching payload
 * Reference "TXR-6347"
-
-
+* Reference "TXR-6379"
+* create a valid "Acceptance" Rule
+* upload Rule
+* check that the response had no error
+* check that the response had the status code "201"
+* check that Rule is in Rulelist
+* get the list of migratables
+* check that the response had no error
+* check that the rule is in the list of migratables
+* migrate Rule with modified payload
+* check that the response had an error
 
 ___
 * delete all created certificates
