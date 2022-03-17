@@ -83,7 +83,7 @@ After a rule is updated and valid the old rule should not be in the downloaded l
 * change ValidFrom to "10"sec in the future
 * upload Rule
 * get Rules of own Country
-* check that both version of the rule are in the rulelist
+* check that both versions of the rule exist
 * wait for "10" seconds
 * get Rules of own Country
 * check that only the new version of the rule is in the list

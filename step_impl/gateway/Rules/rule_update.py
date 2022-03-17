@@ -43,3 +43,16 @@ def check_that_both_versions_of_the_rule_exist():
     newVersion = scenarioRule['Version']
     assert newVersion in versions, f"version {newVersion} not in id list {versions}"
 
+
+@step("check that only the new version of the rule is in the list")
+def check_that_only_the_new_version_of_the_rule_is_in_the_list():
+    response = data_store.scenario["response"]
+    ruleObj = response.json()
+    scenarioRule = data_store.scenario["rule"]
+    ruleId = scenarioRule["Identifier"]
+    assert ruleId in ruleObj.keys(), f"ruleid {ruleId} not in response {ruleObj}"
+    rules = ruleObj[ruleId]
+    versions = [x["version"] for x in rules]
+    assert "1.0.0" not in versions, f"version 1.0.0 in id list {versions}"
+    newVersion = scenarioRule['Version']
+    assert newVersion in versions, f"version {newVersion} not in id list {versions}"

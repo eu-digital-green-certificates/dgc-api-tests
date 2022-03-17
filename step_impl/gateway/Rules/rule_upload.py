@@ -78,8 +78,8 @@ def upload_rule(append_extra_data=False):
 @step("upload Rule with cms header")
 def upload_rule_with_cms_header():
     data = get_signed_rule()
-    cert_location = path.join(certificateFolder, "auth.pem")
-    key_location = path.join(certificateFolder, "key_auth.pem")
+    cert_location = data_store.scenario['certs.auth.crt'] 
+    key_location = data_store.scenario['certs.auth.key'] 
     headers = {"Content-Type": "application/cms",
                "Content-Transfer-Encoding": "base64"}
     response = requests.post(url=baseurl + "/rules",
