@@ -16,15 +16,17 @@
 # ---license-end
 
 from os import path
-from getgauge.python import data_store, step
+from getgauge.python import data_store, step, before_scenario
 from step_impl.util import certificateFolder, secondCountryFolder 
 
+@before_scenario
 @step("use default certificates")
 def select_default_certs():
     data_store.scenario['certs.auth.crt'] = path.join(certificateFolder, "auth.pem")
     data_store.scenario['certs.auth.key'] = path.join(certificateFolder, "key_auth.pem")
     data_store.scenario['certs.upload.crt'] = path.join(certificateFolder, "upload.pem")
     data_store.scenario['certs.upload.key'] = path.join(certificateFolder, "key_upload.pem")
+
 
 @step("use 2nd country for upload signature")
 def select_second_country_upload():
@@ -37,6 +39,6 @@ def select_second_country_tls():
     data_store.scenario['certs.auth.key'] = path.join(certificateFolder, secondCountryFolder, "key_auth.pem")
 
 @step("use unauthorized country for authentication")
-def select_second_country_tls():
+def select_unauthorized_country_tls():
     data_store.scenario['certs.auth.crt'] = path.join(certificateFolder, "custom_auth.pem")
     data_store.scenario['certs.auth.key'] = path.join(certificateFolder, "custom_key_auth.pem")    

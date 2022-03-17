@@ -18,3 +18,7 @@ certificates/**/*.crt
 # Data files
 *.json
 *.zip
+
+# Virtual Envs
+venv/*
+.venv/*

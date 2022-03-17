@@ -50,10 +50,11 @@ def get_signed_rule(append_extra_data=False):
         ruleJson = ruleJson + ruleJson
 
     upload_cert = x509.load_pem_x509_certificate(
-        open(path.join(certificateFolder, "upload.pem"), "rb").read())
+        open(data_store.scenario['certs.upload.crt'], "rb").read())
     upload_key = serialization.load_pem_private_key(
-        open(path.join(certificateFolder, "key_upload.pem"), "rb").read(), None)
+        open(data_store.scenario['certs.upload.key'], "rb").read(), None)
     return create_cms(ruleJson.encode("utf-8"), upload_cert, upload_key)
+
 
 @step("upload Rule with extra data")
 def upload_rule_with_extra_data():
@@ -62,8 +63,8 @@ def upload_rule_with_extra_data():
 @step("upload Rule")
 def upload_rule(append_extra_data=False):
     data = get_signed_rule(append_extra_data)
-    cert_location = path.join(certificateFolder, "auth.pem")
-    key_location = path.join(certificateFolder, "key_auth.pem")
+    cert_location = data_store.scenario['certs.auth.crt'] 
+    key_location = data_store.scenario['certs.auth.key'] 
     headers = {"Content-Type": "application/cms-text",
                "Content-Transfer-Encoding": "base64"}
     response = requests.post(url=baseurl + "/rules",
