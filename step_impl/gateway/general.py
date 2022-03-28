@@ -15,9 +15,20 @@
 # limitations under the License.
 # ---license-end
 
-from os import path
+from time import sleep
+from sys import stdout
+from os import path, environ
 from getgauge.python import data_store, step, before_scenario
 from step_impl.util import certificateFolder, secondCountryFolder 
+
+@before_scenario
+def slow_down_if_test_delay_is_set():
+    'Sleeps for x seconds where x is an integer taken from the "test_delay" environment variable'
+    try: 
+        slowdown = int(environ.get('test_delay'))
+        sleep(slowdown)
+    except: 
+        pass
 
 @before_scenario
 @step("use default certificates")
