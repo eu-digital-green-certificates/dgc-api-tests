@@ -26,7 +26,7 @@ def do_paginated_trust_list_download(path, size):
         response = requests.get(url=url, cert=auth)        
         assert response.ok, "Failed to load trustList: {url} -> {response.status_code}"
         entries = response.json()
-        print(len(entries))
+
         hashlist.extend([entry['thumbprint'] for entry in entries])
 
         if len(entries) < int(size):
@@ -59,7 +59,6 @@ def check_dsc_is_in_trustlist_days_ago(days):
 
     for entry in response.json():
         if entry['thumbprint'] == thumbprint:
-            print(entry)
             if entry['signature'] is None: 
                 assert False, 'DSC is in trust list but is marked as deleted'
             else: 
@@ -79,7 +78,6 @@ def check_dsc_is_deleted_in_trustlist_days_ago(days):
 
     for entry in response.json():
         if entry['thumbprint'] == thumbprint:
-            print(entry)
             if entry['signature'] is not None: 
                 assert False, 'DSC is in trust list but is not deleted'
             else: 
@@ -102,7 +100,6 @@ def load_trust_list_last_modified_days_ago_date_format(days, format_name):
     else: 
         assert False, "Unknown date format"
 
-    print('Date:',date_string)
     auth = (data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key'] )
     response = requests.get(url=f"{baseurl}/trustList", cert=auth, headers={'If-Modified-Since': date_string})        
     data_store.scenario["response"] = response     
