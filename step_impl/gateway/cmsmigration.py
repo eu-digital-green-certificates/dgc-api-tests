@@ -1,12 +1,14 @@
 
-from base64 import b64decode
+from base64 import b64decode, b64encode
 import json
 from webbrowser import get
 import requests
 from asn1crypto import cms
 from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 from step_impl.gateway.revocation import sign_revocation_list_as_first_country
+from step_impl.gateway.dsc_creation import sign_dsc_with_upload_certificate
 from step_impl.util import baseurl
 from step_impl.util.json import DateTimeEncoder
 from step_impl.gateway.Rules.rule_upload import get_signed_rule
@@ -145,10 +147,43 @@ def batch_cms_has_changed():
     assert entry['cms'] != data_store.scenario['cms.before.migration'], 'CMS was not changed'
 
 
-#@step("check that DSC is in the list of migratables")
+@step("check that DSC is in the list of migratables")
 def check_that_dsc_is_in_the_list_of_migratables():
-    assert False, "Add implementation code"
+    if data_store.scenario["migratables"] is None: 
+        decode_migratables_from_response()
 
+    dscRaw = data_store.scenario["dsc"].public_bytes(serialization.Encoding.DER)
+
+    entry = get_matching_migratable( data_store.scenario["migratables"], dscRaw )
+    assert entry is not None, "DSC not found in list of migratables"
+
+@use_upload2_cert
 @step("migrate DSC")
 def migrate_dsc():
-    assert False, "Add implementation code"
+    dscRaw = data_store.scenario["dsc"].public_bytes(serialization.Encoding.DER)
+    if data_store.scenario["migratables"] is None: 
+        decode_migratables_from_response()
+
+    entry = get_matching_migratable( data_store.scenario["migratables"], dscRaw )
+    data_store.scenario['cms.before.migration'] = entry['cms']
+
+    entry['cms']= str(sign_dsc_with_upload_certificate(), 'utf-8') # Replace the CMS in the migratable with the one signed by UPLOAD2 
+    assert data_store.scenario['cms.before.migration'] != entry['cms'], 'New CMS is not different from old one: Fix script'
+    del entry['payload'] # Remove payload attribute
+
+    response = requests.post(url=baseurl + "/cms-migration",
+                             json=entry, 
+                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
+    data_store.scenario["response"] = response     
+
+@step("check that the DSC's new CMS differs from the old one")
+def dsc_cms_has_changed():
+    if data_store.scenario["migratables"] is None: 
+        decode_migratables_from_response()
+
+    dscRaw = data_store.scenario["dsc"].public_bytes(serialization.Encoding.DER)
+
+    entry = get_matching_migratable( data_store.scenario["migratables"], dscRaw )
+    assert entry is not None, "DSC not found in list of migratables"
+    assert entry['cms'] != data_store.scenario['cms.before.migration'], 'CMS was not changed'
+

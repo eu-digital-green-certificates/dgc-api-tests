@@ -21,6 +21,10 @@ Feature: CMS update / migration
 * check that DSC is in the list of migratables
 * migrate DSC
 * check that DSC is in trustlist
+* get the list of migratables
+* check that the response had no error
+* check that DSC is in the list of migratables
+* check that the DSC's new CMS differs from the old one
 
 ## Migrate a Rule
 * Reference "TXR-6345"
@@ -73,7 +77,6 @@ Feature: CMS update / migration
 
 ## Attempt switching payload
 * Reference "TXR-6347"
-* Reference "TXR-6379"
 * create a valid "Acceptance" Rule
 * upload Rule
 * check that the response had no error
