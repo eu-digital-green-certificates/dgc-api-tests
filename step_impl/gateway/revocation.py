@@ -83,11 +83,13 @@ def download_revocation_list_from_days_ago(days):
 
 
 def get_revocation_list(if_modified_since='2021-06-01T00:00:00Z'):
-    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}",
+    try: 
+        response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}",
                             headers={'If-Modified-Since': if_modified_since},
                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
+    except SSLError:
+        response = FailedResponse()    
     data_store.scenario["response"] = response
-    # print("Response: ", response.status_code, response.text)
     return response
 
 
