@@ -8,6 +8,7 @@ All tests to check the download of Valuesets
 
 Get All Valuesets. Response code should be 200.
 
+* Reference "TXR-2885"
 * get all valuesets IDs
 * check that the response is not empty
 * check that the response had no error
@@ -21,6 +22,7 @@ Get All Valuesets. Response code should be 200.
 
 Get data of a specific Valueset. The test first downloads all Valuesets and then checks if it can download the specirif Valueset.
 
+* Reference "TXR-2886"
 * get all valuesets IDs
 * get details of first Valueset in list
 * check that the response is not empty
@@ -32,6 +34,7 @@ tags: negative_test
 
 Use an NBTLS to try to authenticate when downloading the Valuesets
 
+* Reference "TXR-2887"
 * create custom authentication certificate
 * get all valuesets with custom certificate
 * check that the response had an error
@@ -41,6 +44,7 @@ Use an NBTLS to try to authenticate when downloading the Valuesets
 
 The National Backend should update the RAT Valuesets from the JRC database.
 
+* Reference "TXR-3213"
 * get RAT Valuesets from JRC database
 * get RAT Valuesets from Gateway
 * check that RAT Valuesets from JRC database and Gateway match

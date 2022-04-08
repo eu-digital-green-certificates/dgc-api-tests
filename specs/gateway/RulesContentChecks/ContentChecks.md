@@ -16,6 +16,7 @@ tags: negative_test
 
 Country attribute in a Rule should be like "en". Otherwise there should be an error
 
+* Reference "TXR-2875"
 * create a valid <Ruletype> Rule
 * change countrycode to a wrong format
 * upload Rule
@@ -29,6 +30,7 @@ tags: negative_test
 
 Upload a Rule from another country. There should be an error.
 
+* Reference "TXR-2876"
 * create a valid <Ruletype> Rule
 * change countrycode to a wrong country
 * upload Rule
@@ -42,6 +44,7 @@ tags: negative_test
 
 Upload a Rule with the Identifier of another Country
 
+* Reference "TXR-3004"
 * create a valid <Ruletype> Rule
 * change countrycode in Identifier to a wrong country
 * upload Rule
@@ -55,6 +58,7 @@ tags: negative_test
 
 A Rule must have a description. An empty description should be an error.
 
+* Reference "TXR-2879"
 * create a valid <Ruletype> Rule
 * remove description of the Rule
 * upload Rule
@@ -68,6 +72,7 @@ tags: negative_test
 
 A Rule must have a description. Those descriptions must have a length of at least 20 characters.
 
+* Reference "TXR-3031"
 * create a valid <Ruletype> Rule
 * change description to have less than "20" characters
 * upload Rule
@@ -81,6 +86,7 @@ tags: negative_test
 
 A Rule must have a description in english. Only having a description in another language should be an error.
 
+* Reference "TXR-2880"
 * create a valid <Ruletype> Rule
 * use only german in the description of the Rule
 * upload Rule
@@ -94,6 +100,7 @@ tags: negative_test
 
 Languages of a Rule should have the formatting like "en" or "en-uk". Otherwise there should be an error.
 
+* Reference "TXR-2881"
 * create a valid <Ruletype> Rule
 * add language "en-" in description
 * upload Rule
@@ -107,6 +114,7 @@ tags: negative_test
 
 Rule Version should be created with semantic versioning (like "1.2.3" and not like "1.2"). Otherwise there should be an error.
 
+* Reference "TXR-2882"
 * create a valid <Ruletype> Rule
 * set version of the Rule to "10"
 * upload Rule
@@ -120,6 +128,7 @@ tags: negative_test
 
 Rule Schema Version should be created with semantic versioning (like "1.2.3" and not like "1.2"). Otherwise there should be an error.
 
+* Reference "TXR-2883"
 * create a valid <Ruletype> Rule
 * set version of the schema to "10"
 * upload Rule
@@ -133,6 +142,7 @@ tags: negative_test
 
 Value of ValidFrom must be before value of ValidTo
 
+* Reference "TXR-3005"
 * create a valid <Ruletype> Rule
 * set ValidFrom after ValidTo value
 * upload Rule
@@ -146,6 +156,7 @@ tags: negative_test
 
 Value of ValidFrom must be within 2 weeks from today
 
+* Reference "TXR-3006"
 * create a valid <Ruletype> Rule
 * set ValidFrom more than "14" days in the future
 * upload Rule

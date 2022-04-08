@@ -10,6 +10,7 @@ tags: negative_test
 
 Upload a Acceptance Rule which is valid ealier than 48h. There should be an error.
 
+* Reference "TXR-2877"
 * create a valid Acceptance Rule
 * change ValidFrom less than "48"h
 * upload Rule
@@ -24,6 +25,7 @@ tags: negative_test
 
 Test that the Gateway responds with an error message if the ValidTo Value is less than 120h in the future
 
+* Reference "TXR-2878"
 * create a valid Acceptance Rule
 * change ValidTo to "71"h after the current ValidFrom
 * upload Rule
@@ -37,6 +39,7 @@ tags: negative_test
 
 Upload a Acceptance Rule where the CertificateType is not matching the Rule Identifier of the Rule
 
+* Reference "TXR-3090"
 * create a valid Acceptance Rule
 * change CertificateType to be invalid
 * upload Rule

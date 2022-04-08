@@ -14,6 +14,7 @@ all test cases for getting the DSC (Signing Certificates)
 
 Get all trusted public keys
 
+* Reference "TXR-2071"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * check that DSC is not in trustlist
@@ -26,6 +27,7 @@ Get all trusted public keys
 
 get all trusted public keys of a specific type
 
+* Reference "TXR-2072"
 * get the trustList with the type <type>
 * check that the response had no error
 * check that only entries of the type <type> are present
@@ -34,6 +36,7 @@ get all trusted public keys of a specific type
 
 get all trusted public keys of a specific type and country
 
+* Reference "TXR-2973"
 * get the trustList with the type <type> and country <country>
 * check that the response had no error
 * check that only entries of the type <type> and <country> are present

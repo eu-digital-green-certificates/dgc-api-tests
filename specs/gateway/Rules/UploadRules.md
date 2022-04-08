@@ -13,6 +13,7 @@ Tests to upload new rules
 
 Upload a valid invalidation Rule. Invalidation Rule is used because it can be deleted automatically
 
+* Reference "TXR-2860"
 * create a valid <Ruletype> Rule
 * upload Rule
 * check that the response had no error
@@ -23,6 +24,7 @@ Upload a valid invalidation Rule. Invalidation Rule is used because it can be de
 
 The content type header of rules normally in the test is "application/cms-text" but it can also be "application/cms" like for the certificates
 
+* Reference "TXR-3209"
 * create a valid <Ruletype> Rule
 * upload Rule with cms header
 * check that the response had no error
@@ -35,6 +37,7 @@ tags: negative_test
 
 Upload a Rule with an unauthenticated certificate. There should be an error and the Response Code should be 401.
 
+* Reference "TXR-2861"
 * create a valid <Ruletype> Rule
 * create custom authentication certificate
 * upload Rule with custom authentication certificate
@@ -48,6 +51,7 @@ tags: negative_test
 
 Upload a Rule with a NBTLS certificate of another country. There should be an error and the status code should be 400.
 
+* Reference "TXR-2862"
 * create a valid <Ruletype> Rule
 * upload Rule with certificate from another country
 * check that the response had an error

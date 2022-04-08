@@ -20,11 +20,12 @@ from datetime import datetime, timedelta, timezone
 from random import randbytes
 
 import requests
+from requests.exceptions import SSLError
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from getgauge.python import data_store, step
 
-from step_impl.util import baseurl
+from step_impl.util import baseurl, FailedResponse
 from step_impl.util.certificates import create_cms
 
 REVOCATION_LIST_PATH = '/revocation-list'
@@ -82,11 +83,13 @@ def download_revocation_list_from_days_ago(days):
 
 
 def get_revocation_list(if_modified_since='2021-06-01T00:00:00Z'):
-    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}",
+    try: 
+        response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}",
                             headers={'If-Modified-Since': if_modified_since},
                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
+    except SSLError:
+        response = FailedResponse()    
     data_store.scenario["response"] = response
-    # print("Response: ", response.status_code, response.text)
     return response
 
 
@@ -100,11 +103,14 @@ def check_that_only_results_from_days_ago_are_in_the_response(days):
 
 @step("download uploaded batch")
 def get_revocation_list_batch():
-    response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{data_store.scenario['revocation.list.batch_id']}",
+    try:
+        response = requests.get(f"{baseurl}{REVOCATION_LIST_PATH}/{data_store.scenario['revocation.list.batch_id']}",
                             cert=(data_store.scenario['certs.auth.crt'], data_store.scenario['certs.auth.key']))
-    # print(base64.b64decode(response.text))
-    data_store.scenario["response"] = response
-    return response
+        data_store.scenario["response"] = response
+    except SSLError:
+        data_store.scenario["response"] = FailedResponse()
+
+    return  data_store.scenario["response"]
 
 
 @step("upload revocation batch")
