@@ -10,6 +10,7 @@ tags:
 
 Delete a DSC certificate of a country
 
+* Reference "TRX-2065"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * upload DSC
@@ -25,6 +26,7 @@ tags:
 
 Delete a DSC certificate of a country by using the POST endpoint. This is used so that a body can be used in a POST request instead of a DELETE request.
 
+* Reference "TXR-3200"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * upload DSC
@@ -38,9 +40,9 @@ Delete a DSC certificate of a country by using the POST endpoint. This is used s
 
 tags: negative_test
 
-
 Delete a DSC of a country with an unauthorized client certificate.
 
+* Reference "TXR-2069"
 * get the trustList with the type "DSC"
 * create custom authentication certificate
 * delete random DSC with custom client certificate
@@ -53,6 +55,7 @@ tags: negative_test
 
 delete a DSC of another country with the client certificate not authorized to change a DSC of that country. The error code should be 400 "Bad Request"
 
+* Reference "TXR-2070"
 * get the trustList with the type "DSC"
 * get random DSC from trustlist from another country
 * delete DSC from another country
@@ -65,6 +68,7 @@ tags: negative_test
 
 delete a DSC of a country which is not in the database. The error code should be 400 "Bad Request"
 
+* Reference "TXR-2066"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * delete DSC created

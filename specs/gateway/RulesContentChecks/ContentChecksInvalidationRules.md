@@ -10,6 +10,7 @@ tags: negative_test
 
 Test that the Gateway responds with an error message if the ValidFrom Value is not in the Future
 
+* Reference "TXR-3007"
 * create a valid Invalidation Rule
 * change ValidFrom less than "0"h
 * upload Rule

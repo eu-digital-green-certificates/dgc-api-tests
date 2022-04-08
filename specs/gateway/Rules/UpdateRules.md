@@ -8,6 +8,7 @@ Tests to update rules
 
 Update a Rule created to a new version.
 
+* Reference "TXR-2863"
 * create a valid Invalidation Rule
 * upload Rule
 * change Rule to new version
@@ -21,6 +22,7 @@ Update a Rule created to a new version.
 
 Update a Rule created to a new version and ValidFrom value later than old rule. In the end both Versions of the rule should be downloaded.
 
+* Reference "TXR-3032"
 * create a valid Invalidation Rule
 * upload Rule
 * change Rule to new version
@@ -37,6 +39,7 @@ tags: negative_test
 
 Update a Rule with a Rule lower than the current version. There should be an error.
 
+* Reference "TXR-2864"
 * create a valid Invalidation Rule
 * upload Rule
 * change Rule to lower version
@@ -50,6 +53,7 @@ tags: negative_test
 
 Update a Rule without following the semantic versioning scheme (e.g. 1.3 instead of 1.3.0)
 
+* Reference "TXR-2865"
 * create a valid Invalidation Rule
 * upload Rule
 * change rule to version in wrong format
@@ -77,6 +81,7 @@ Update Rule with ValidFrom less than ValidFrom of older Version
 
 After a rule is updated and valid the old rule should not be in the downloaded list
 
+* Reference "TXR-2884"
 * create a valid Invalidation Rule
 * upload Rule
 * change Rule to new version

@@ -8,6 +8,7 @@ All Tests for downloading Rules from the Gateway
 
 Get all onboarded countries. Should have at least the own country in the list.
 
+* Reference "TXR-2866"
 * get all onboarded countries
 * check that the response had no error
 * check that the response had the status code "200"
@@ -19,6 +20,7 @@ tags: negative_test
 
 Get all onboarded countries with unauthenticated NBTLS. Should lead to an error.
 
+* Reference "TXR-2868"
 * create custom authentication certificate
 * get all onboarded countries with custom certificate
 * check that the response had an error
@@ -28,6 +30,7 @@ Get all onboarded countries with unauthenticated NBTLS. Should lead to an error.
 
 Download Rules of all Countries.
 
+* Reference "TXR-2867"
 * get all onboarded countries
 * download rules of all countries
 * check that all responses had no error
@@ -40,6 +43,7 @@ tags: negative_test
 
 Get Rules from any country with an unauthenticated NBTLS. Should lead to an error.
 
+* Reference "TXR-2869"
 * get all onboarded countries
 * create custom authentication certificate
 * download rules of all countries with custom certificate

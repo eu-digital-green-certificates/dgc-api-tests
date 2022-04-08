@@ -10,6 +10,7 @@ tags:
 
 Upload a DSC for a country
 
+* Reference "TXR-2059"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * upload DSC
@@ -22,6 +23,7 @@ tags: negative_test
 
 Upload a DSC of a country with an unauthorized client certificate. The response should be with the status code 401 Unauthorized
 
+* Reference "TXR-2060"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * create custom authentication certificate
@@ -35,6 +37,7 @@ tags: negative_test
 
 Upload a DSC signed with CSCA certificate of a different country. The response code should be 400
 
+* Reference "TXR-2061"
 * create a DSC for another country
 * sign DSC with UPLOAD certificate of another country
 * upload DSC
@@ -47,6 +50,7 @@ tags: negative_test
 
 Upload a DSC of a country with the wrong format to trigger Error Code 400
 
+* Reference "TXR-2062"
 * create a valid DSC
 * upload unsigned DSC
 * check that the response had an error
@@ -58,6 +62,7 @@ tags: negative_test
 
 Upload a DSC of a country with a UUID which is already in the database. The API should respond with the error Code 409.
 
+* Reference "TXR-2063"
 * create a valid DSC
 * sign DSC with UPLOAD certificate
 * upload DSC
