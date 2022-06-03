@@ -42,6 +42,7 @@ Finally, compare the downloaded lists and check that they have the same content.
 ## Date formats 
 
 Check that both ISO 8601 and RFC 2616 date formats are accepted
+Known Bug: https://github.com/eu-digital-green-certificates/dgc-gateway/issues/174
 
 * Reference "TXR-6427"
 * load trust list last modified "30" days ago date format "ISO 8601"
