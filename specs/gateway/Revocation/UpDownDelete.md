@@ -39,7 +39,7 @@ Test cases for the upload and download of revocation lists
 * sign revocation batch
 * upload revocation batch
 * check that the response had no error
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * batch can be found
 
@@ -50,7 +50,7 @@ Test cases for the upload and download of revocation lists
 * sign revocation batch
 * upload revocation batch
 * check that the response had no error
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * batch can be found
 
@@ -61,7 +61,7 @@ Test cases for the upload and download of revocation lists
 * sign revocation batch
 * upload revocation batch
 * check that the response had no error
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * batch can be found
 
@@ -121,7 +121,7 @@ Test cases for the upload and download of revocation lists
 * check that the response had no error
 * delete uploaded revocation batches
 * check that deletion responses are ok
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * check that deleted batches are deleted
 
@@ -135,7 +135,7 @@ Test cases for the upload and download of revocation lists
 * check that the response had no error
 * delete uploaded revocation batches using alternate endpoint
 * check that deletion responses are ok
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * check that deleted batches are deleted
 
@@ -146,7 +146,7 @@ Test cases for the upload and download of revocation lists
 * sign revocation batch
 * upload revocation batch
 * check that the response had no error
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * create custom authentication certificate
 * use unauthorized country for authentication
@@ -179,7 +179,7 @@ Test cases for the upload and download of revocation lists
 * use 2nd country for upload signature
 * delete uploaded revocation batches using current certificates
 * use default certificates
-* download revocation list from "1" days ago
+* download revocation list from "5" minutes ago
 * check that the response had no error
 * check that deleted batches are not deleted
 ____

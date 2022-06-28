@@ -77,7 +77,14 @@ def sign_revocation_list_as_first_country():
 
 @step("download revocation list from <days> days ago")
 def download_revocation_list_from_days_ago(days):
-    pivot_date = datetime.now() - timedelta(days=int(days))
+    pivot_date = datetime.utcnow() - timedelta(days=int(days))
+    date_str = pivot_date.isoformat(timespec='hours') + ':00:00Z'
+    return get_revocation_list(if_modified_since=date_str)
+
+
+@step("download revocation list from <minutes> minutes ago")
+def download_revocation_list_from_days_ago(minutes):
+    pivot_date = datetime.utcnow() - timedelta(minutes=int(minutes))
     date_str = pivot_date.isoformat(timespec='hours') + ':00:00Z'
     return get_revocation_list(if_modified_since=date_str)
 
