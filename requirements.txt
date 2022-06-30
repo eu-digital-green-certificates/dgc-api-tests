@@ -1,0 +1,7 @@
+getgauge
+requests
+cryptography 
+asn1crypto
+cose
+base45
+pyjwt
