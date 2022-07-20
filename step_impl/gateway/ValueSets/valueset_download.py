@@ -90,7 +90,7 @@ def check_that_rat_valuesets_from_jrc_database_and_gateway_match():
     jreValueset = data_store.scenario["jre_valueset"]
     gatewayData = data_store.scenario["gateway_valueset"]
     gatewayValuesets = gatewayData["valueSetValues"]
-    for device in jreValueset['deviceList']:
+    for device in jreValueset:
         deviceId = device['id_device']
         assert deviceId in gatewayValuesets.keys(
         ), f"id {deviceId} not in gateway. Keys: {gatewayValuesets.keys()}"
