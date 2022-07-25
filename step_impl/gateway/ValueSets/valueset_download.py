@@ -87,13 +87,15 @@ def get_rat_valuesets_from_gateway():
 
 @step("check that RAT Valuesets from JRC database and Gateway match")
 def check_that_rat_valuesets_from_jrc_database_and_gateway_match():
-    jreValueset = data_store.scenario["jre_valueset"]
-    gatewayData = data_store.scenario["gateway_valueset"]
-    gatewayValuesets = gatewayData["valueSetValues"]
-    for device in jreValueset:
-        deviceId = device['id_device']
-        assert deviceId in gatewayValuesets.keys(
-        ), f"id {deviceId} not in gateway. Keys: {gatewayValuesets.keys()}"
-        gatewayValueset = gatewayValuesets[deviceId]
-        assert device["hsc_common_list"] == gatewayValueset['active'], f"expected valueset {deviceId} to be {'active' if device['hsc_common_list'] else 'inactive'} but it wasn't"
+    jrcValuesets = data_store.scenario["jre_valueset"]
+    gatewayValuesets = data_store.scenario["gateway_valueset"]["valueSetValues"]
+    
+    device_ids_in_gateway = set(gatewayValuesets.keys())
+    active_device_ids_in_gateway = set([ device_id for device_id, device in gatewayValuesets.items() if device['active'] == True ])
+    jrc_device_ids_with_non_empty_history = set([device['id_device'] for device in jrcValuesets if len(device['hsc_list_history']) > 0])
+    jrc_device_ids_with_mutual_recognition = set([device['id_device'] for device in jrcValuesets if device['hsc_mutual_recognition'] == True])
+
+    assert device_ids_in_gateway == jrc_device_ids_with_non_empty_history, "All devices with a non-empty history should be in Gateway"
+    assert active_device_ids_in_gateway == jrc_device_ids_with_mutual_recognition, "Only devices with mutual recognition should be active"
+
 
