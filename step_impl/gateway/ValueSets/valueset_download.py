@@ -76,7 +76,10 @@ def get_rat_valuesets_from_jrc_database():
     response = requests.get(jreurl)
     assert response.ok, "could not get Valueset from JRC database"
     data_store.scenario["response"] = response
-    data_store.scenario["jre_valueset"] = response.json()
+    data_store.scenario["jrc_valueset"] = response.json()
+    # JRC Valueset may use two different formats
+    if 'deviceList' in data_store.scenario["jrc_valueset"]:
+        data_store.scenario["jrc_valueset"] = data_store.scenario["jrc_valueset"]["deviceList"]
 
 @step("get RAT Valuesets from Gateway")
 def get_rat_valuesets_from_gateway():
@@ -87,7 +90,7 @@ def get_rat_valuesets_from_gateway():
 
 @step("check that RAT Valuesets from JRC database and Gateway match")
 def check_that_rat_valuesets_from_jrc_database_and_gateway_match():
-    jrcValuesets = data_store.scenario["jre_valueset"]
+    jrcValuesets = data_store.scenario["jrc_valueset"]
     gatewayValuesets = data_store.scenario["gateway_valueset"]["valueSetValues"]
     
     device_ids_in_gateway = set(gatewayValuesets.keys())
