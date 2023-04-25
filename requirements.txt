@@ -5,3 +5,4 @@ asn1crypto
 cose
 base45
 pyjwt
+pycryptodome
